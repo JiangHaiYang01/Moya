@@ -1,13 +1,12 @@
 package com.allens.moya_coroutines.request
 
-import android.util.Log
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.viewModelScope
-import com.allens.moya.impl.Disposable
+import com.allens.moya.result.Disposable
 import com.allens.moya.manager.HttpManager
-import com.allens.moya.request.HttpResult
+import com.allens.moya.result.HttpResult
 import com.allens.moya_coroutines.impl.ApiService
 import kotlinx.coroutines.*
 import okhttp3.ResponseBody

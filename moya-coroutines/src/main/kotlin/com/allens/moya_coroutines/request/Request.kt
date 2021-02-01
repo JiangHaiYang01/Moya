@@ -1,8 +1,12 @@
 package com.allens.moya_coroutines.request
 
-import com.allens.moya.impl.Disposable
+import com.allens.moya.result.Disposable
 import com.allens.moya.request.*
+import com.allens.moya.result.HttpResult
 import com.allens.moya.tools.UrlTool
+import com.allens.moya_coroutines.manager.DownLoadManager
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.RequestBody.Companion.toRequestBody
 
@@ -114,4 +118,22 @@ inline fun <reified T : Any> Request.Builder.doPut(
     crossinline block: suspend (HttpResult<T>) -> Unit
 ): Disposable = executeDisable(viewModel, lifecycle, manager, block) {
     executePut(parameter)
+}
+
+
+//=============================================================
+// 下载
+//=============================================================
+suspend fun Request.Builder.doDownLoad(request: DownLoadRequest) {
+    withContext(Dispatchers.IO) {
+        val coroutinesDownLoadRequest = CoroutinesDownLoadRequest().also {
+            it.coroutines = this
+            it.url = request.url
+            it.listener = request.listener
+            it.name = request.name
+            it.path = request.path
+            it.manager = manager
+        }
+        DownLoadManager.startDownLoad(coroutinesDownLoadRequest)
+    }
 }

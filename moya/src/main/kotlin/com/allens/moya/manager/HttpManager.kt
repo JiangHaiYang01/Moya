@@ -9,6 +9,7 @@ import com.allens.moya.config.DefaultConfig
 import com.allens.moya.config.HttpConfig
 import com.allens.moya.enums.HttpNetWorkType
 import com.allens.moya.interceptor.*
+import com.allens.moya.tools.PrefTools
 import com.franmontiel.persistentcookiejar.PersistentCookieJar
 import com.franmontiel.persistentcookiejar.cache.SetCookieCache
 import com.franmontiel.persistentcookiejar.persistence.SharedPrefsCookiePersistor
@@ -33,6 +34,10 @@ class HttpManager {
     fun createManager(config: HttpConfig, context: Context): HttpManager {
         this.config = config
         this.context = context.applicationContext
+
+        //初始化 MMKV
+        PrefTools.init(context)
+
         val interceptor = LogInterceptor.register(config, handler)
 
         val okHttpBuilder = buildOkHttp(interceptor)

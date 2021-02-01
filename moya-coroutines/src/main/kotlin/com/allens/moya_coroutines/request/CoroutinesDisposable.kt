@@ -1,6 +1,6 @@
 package com.allens.moya_coroutines.request
 
-import com.allens.moya.impl.Disposable
+import com.allens.moya.result.Disposable
 import kotlinx.coroutines.Job
 
 class CoroutinesDisposable(private val job: Job) : Disposable {

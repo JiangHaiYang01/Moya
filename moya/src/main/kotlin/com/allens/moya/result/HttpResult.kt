@@ -1,4 +1,4 @@
-package com.allens.moya.request
+package com.allens.moya.result
 
 import androidx.annotation.MainThread
 
