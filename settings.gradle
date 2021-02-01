@@ -1,3 +1,4 @@
 rootProject.name = "Moya"
 include ':moya'
 include ':simple-coroutines'
+include ':moya-coroutines'
