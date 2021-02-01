@@ -1,5 +1,6 @@
 package com.allens.moya_coroutines.request
 
+import android.util.Log
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.lifecycleScope
@@ -62,10 +63,18 @@ inline fun executeRequest(
 inline fun <reified T : Any> decode(
     manager: HttpManager,
     block: () -> String?,
-): HttpResult<T> = try {
-    HttpResult.Success(manager.gson.fromJson(block(), T::class.java))
-} catch (t: Throwable) {
-    HttpResult.Error(t)
+): HttpResult<T> {
+    return try {
+        val name1 = T::class.java.name
+        val name2 = String::class.java.name
+        if (name1 == name2) {
+            HttpResult.Success(block() as T)
+        } else {
+            HttpResult.Success(manager.gson.fromJson(block(), T::class.java))
+        }
+    } catch (t: Throwable) {
+        HttpResult.Error(t)
+    }
 }
 
 
