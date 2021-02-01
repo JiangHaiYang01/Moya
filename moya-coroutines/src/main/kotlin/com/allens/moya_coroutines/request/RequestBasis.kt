@@ -39,7 +39,10 @@ inline fun <reified T : Any> executeDisable(
     crossinline action: suspend () -> String?
 ): Disposable {
     val job = executeRequest(viewModel = viewModel, lifecycleOwner = lifecycle) {
-        block(decode(manager) { action() })
+        val result = decode<T>(manager) { action() }
+        withContext(Dispatchers.Main) {
+            block(result)
+        }
     }
     return CoroutinesDisposable(job)
 }
