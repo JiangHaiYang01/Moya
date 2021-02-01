@@ -18,7 +18,6 @@ import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import java.io.File
-import kotlin.math.log
 
 
 class HttpManager {
