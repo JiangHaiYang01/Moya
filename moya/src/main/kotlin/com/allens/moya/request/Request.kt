@@ -1,6 +1,5 @@
 package com.allens.moya.request
 
-import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModel
 import com.allens.moya.enums.DynamicHeard
@@ -17,7 +16,7 @@ class Request {
         val heard = HashMap<String, String>()
         val map = HashMap<String, Any>()
         val files = HashMap<String, ProgressRequestBody>()
-        var lifecycle: LifecycleOwner? = null
+        var owner: LifecycleOwner? = null
         var viewModel: ViewModel? = null
 
         //添加请求头
@@ -31,7 +30,7 @@ class Request {
         }
 
         fun lifecycle(lifecycle: LifecycleOwner?) = apply {
-            this.lifecycle = lifecycle
+            this.owner = lifecycle
         }
 
         fun viewModel(viewModel: ViewModel) = apply {

@@ -2,6 +2,7 @@ package com.allens.simple_coroutines
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.os.Environment
 import android.util.Log
 import android.widget.LinearLayout
 import androidx.lifecycle.LifecycleObserver
@@ -13,6 +14,7 @@ import com.allens.moya_coroutines.request.doGet
 import com.google.android.material.button.MaterialButton
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.MainScope
+import java.io.File
 
 abstract class BaseActivity : AppCompatActivity(), CoroutineScope by MainScope() {
     lateinit var linear: LinearLayout
@@ -49,6 +51,16 @@ abstract class BaseActivity : AppCompatActivity(), CoroutineScope by MainScope()
         owner: ViewModelStoreOwner, cls: Class<VM>
     ): VM {
         return ViewModelProvider(owner).get(cls)
+    }
+
+    //获取更路径
+     fun getBasePath(): String {
+        var p: String = Environment.getExternalStorageState()
+        val f: File? = getExternalFilesDir(null)
+        if (null != f) {
+            p = f.absolutePath
+        }
+        return p
     }
 }
 

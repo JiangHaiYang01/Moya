@@ -4,5 +4,5 @@ import com.allens.moya.request.BasicDownLoadRequest
 
 
 interface OnDownLoadInterceptor {
-    fun onIntercept(request: BasicDownLoadRequest): Boolean
+    fun onIntercept(request: BasicDownLoadRequest,function:(Throwable)->Unit): Boolean
 }

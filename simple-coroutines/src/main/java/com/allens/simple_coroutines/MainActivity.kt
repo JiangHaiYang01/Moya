@@ -13,8 +13,11 @@ import kotlinx.coroutines.launch
 class MainActivity : BaseActivity() {
 
     override fun doCreate() {
-        addButton("测试") {
+        addButton("常规使用") {
             startActivity(Intent(this, TestActivity::class.java))
+        }
+        addButton("下载") {
+            startActivity(Intent(this, DownLoadActivity::class.java))
         }
     }
 }

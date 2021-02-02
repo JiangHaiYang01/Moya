@@ -18,6 +18,7 @@
             </intent-filter>
         </activity>
         <activity android:name=".TestActivity"/>
+        <activity android:name=".DownLoadActivity"/>
     </application>
 
 </manifest>

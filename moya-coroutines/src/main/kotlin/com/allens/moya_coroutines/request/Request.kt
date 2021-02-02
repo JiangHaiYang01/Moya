@@ -1,5 +1,6 @@
 package com.allens.moya_coroutines.request
 
+import com.allens.moya.livedata.observerState
 import com.allens.moya.result.Disposable
 import com.allens.moya.request.*
 import com.allens.moya.result.HttpResult
@@ -39,7 +40,7 @@ suspend inline fun <reified T : Any> Request.Builder.doGet(
 inline fun <reified T : Any> Request.Builder.doGet(
     parameter: String,
     crossinline block: suspend (HttpResult<T>) -> Unit
-): Disposable = executeDisable(viewModel, lifecycle, manager, block) {
+): Disposable = executeDisable(viewModel, owner, manager, block) {
     executeGet(parameter)
 }
 
@@ -57,7 +58,7 @@ suspend inline fun <reified T : Any> Request.Builder.doPost(
 inline fun <reified T : Any> Request.Builder.doPost(
     parameter: String,
     crossinline block: suspend (HttpResult<T>) -> Unit
-): Disposable = executeDisable(viewModel, lifecycle, manager, block) {
+): Disposable = executeDisable(viewModel, owner, manager, block) {
     executePost(parameter)
 }
 
@@ -79,7 +80,7 @@ suspend inline fun <reified T : Any> Request.Builder.doBody(
 inline fun <reified T : Any> Request.Builder.doBody(
     parameter: String,
     crossinline block: suspend (HttpResult<T>) -> Unit
-): Disposable = executeDisable(viewModel, lifecycle, manager, block) {
+): Disposable = executeDisable(viewModel, owner, manager, block) {
     executeBody(parameter)
 }
 
@@ -98,7 +99,7 @@ suspend inline fun <reified T : Any> Request.Builder.doDelete(
 inline fun <reified T : Any> Request.Builder.doDelete(
     parameter: String,
     crossinline block: suspend (HttpResult<T>) -> Unit
-): Disposable = executeDisable(viewModel, lifecycle, manager, block) {
+): Disposable = executeDisable(viewModel, owner, manager, block) {
     executeDelete(parameter)
 }
 
@@ -116,7 +117,7 @@ suspend inline fun <reified T : Any> Request.Builder.doPut(
 inline fun <reified T : Any> Request.Builder.doPut(
     parameter: String,
     crossinline block: suspend (HttpResult<T>) -> Unit
-): Disposable = executeDisable(viewModel, lifecycle, manager, block) {
+): Disposable = executeDisable(viewModel, owner, manager, block) {
     executePut(parameter)
 }
 
@@ -124,6 +125,7 @@ inline fun <reified T : Any> Request.Builder.doPut(
 //=============================================================
 // 下载
 //=============================================================
+//todo 这里 需要做一个协程的异常处理
 suspend fun Request.Builder.doDownLoad(request: DownLoadRequest) {
     withContext(Dispatchers.IO) {
         val coroutinesDownLoadRequest = CoroutinesDownLoadRequest().also {
@@ -134,6 +136,25 @@ suspend fun Request.Builder.doDownLoad(request: DownLoadRequest) {
             it.path = request.path
             it.manager = manager
         }
-        DownLoadManager.startDownLoad(coroutinesDownLoadRequest)
+        val startDownLoad = DownLoadManager.startDownLoad(coroutinesDownLoadRequest)
+        withContext(Dispatchers.Main){
+            startDownLoad.observerState(owner!!) {
+                onError = {
+                    println("failed ${it.message}")
+                }
+                onPrepare = {
+                    println("prepare")
+                }
+                onSuccess = {
+                    println("success $it")
+                }
+                onProgress = {
+                    println("progress:$it")
+                }
+            }
+        }
+
+
+
     }
 }
