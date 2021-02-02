@@ -1,5 +1,7 @@
 package com.allens.moya.result
 
+import com.allens.moya.livedata.DownLoadStatusLiveData
+
 sealed class DownLoadResult<out T : Any> {
 
     object Prepare : DownLoadResult<Nothing>()
@@ -9,9 +11,11 @@ sealed class DownLoadResult<out T : Any> {
 }
 
 
-class DownLoadResultBuilder<T>() {
-    var onPrepare: () -> Unit = {}
-    var onProgress: (progress: Int) -> Unit = {}
-    var onSuccess: (data: T) -> Unit = {}
-    var onError: (Throwable) -> Unit = {}
-}
+//class DownLoadResultBuilder<T>() {
+//    var onPrepare: () -> Unit = {}
+//    var onProgress: (progress: Int) -> Unit = {}
+//    var onSuccess: (data: T) -> Unit = {}
+//    var onError: (Throwable) -> Unit = {}
+//}
+
+data class DownLoadData(var liveData: DownLoadStatusLiveData<String>, var disposable: Disposable?)

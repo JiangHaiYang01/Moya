@@ -6,6 +6,7 @@ import com.allens.moya.livedata.DownLoadStatusLiveData
 import com.allens.moya.request.BasicDownLoadRequest
 import com.allens.moya.request.DownLoadRequest
 import com.allens.moya.result.Disposable
+import com.allens.moya.result.DownLoadData
 import com.allens.moya.result.DownLoadResult
 import com.allens.moya.tools.FileTool
 import com.allens.moya.tools.MoyaLogTool
@@ -48,16 +49,15 @@ abstract class DownLoadManagerImpl<T : BasicDownLoadRequest> {
         liveData: DownLoadStatusLiveData<R>,
         status: DownLoadResult<R>
     ) {
-        MoyaLogTool.i("当前的线程 ${Thread.currentThread().name}")
         liveData.postValue(status)
     }
 
-    fun startDownLoad(request: T): DownLoadStatusLiveData<String> {
+    fun startDownLoad(request: T): DownLoadData {
         MoyaLogTool.i("准备开始校验是否合法")
         val liveData = DownLoadStatusLiveData<String>()
         if (!check(request, liveData)) {
             MoyaLogTool.i("校验不通过")
-            return liveData
+            return DownLoadData(liveData, null)
         }
         MoyaLogTool.i("校验通过")
         MoyaLogTool.i("---->${Thread.currentThread().name}")
@@ -71,8 +71,9 @@ abstract class DownLoadManagerImpl<T : BasicDownLoadRequest> {
             PrefTools.getLong(request)
         }
         MoyaLogTool.i("当前下载的位置:${currentLength}")
+        var disposable: Disposable? = null
         try {
-            val disposable = startRequest(request, currentLength) {
+            disposable = startRequest(request, currentLength) {
                 if (it == null) {
                     changeStatus(liveData, DownLoadResult.Error(Throwable("response body is null")))
                     PrefTools.remove(request)
@@ -108,7 +109,7 @@ abstract class DownLoadManagerImpl<T : BasicDownLoadRequest> {
             changeStatus(liveData, DownLoadResult.Error(t))
             PrefTools.remove(request)
         } finally {
-            return liveData
+            return DownLoadData(liveData, disposable = disposable)
         }
     }
 

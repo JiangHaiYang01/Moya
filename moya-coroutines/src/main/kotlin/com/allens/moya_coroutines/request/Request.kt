@@ -1,9 +1,12 @@
 package com.allens.moya_coroutines.request
 
+import androidx.lifecycle.LifecycleOwner
 import com.allens.moya.livedata.observerState
 import com.allens.moya.result.Disposable
 import com.allens.moya.request.*
+import com.allens.moya.result.DownLoadDisposable
 import com.allens.moya.result.HttpResult
+import com.allens.moya.tools.MoyaLogTool
 import com.allens.moya.tools.UrlTool
 import com.allens.moya_coroutines.manager.DownLoadManager
 import kotlinx.coroutines.Dispatchers
@@ -125,9 +128,9 @@ inline fun <reified T : Any> Request.Builder.doPut(
 //=============================================================
 // 下载
 //=============================================================
-//todo 这里 需要做一个协程的异常处理
-suspend fun Request.Builder.doDownLoad(request: DownLoadRequest) {
-    withContext(Dispatchers.IO) {
+suspend fun Request.Builder.doDownLoad(request: DownLoadRequest): DownLoadDisposable {
+    return withContext(Dispatchers.IO) {
+        val result = CoroutinesDownLoadDisposable(this)
         val coroutinesDownLoadRequest = CoroutinesDownLoadRequest().also {
             it.coroutines = this
             it.url = request.url
@@ -136,25 +139,22 @@ suspend fun Request.Builder.doDownLoad(request: DownLoadRequest) {
             it.path = request.path
             it.manager = manager
         }
-        val startDownLoad = DownLoadManager.startDownLoad(coroutinesDownLoadRequest)
-        withContext(Dispatchers.Main){
-            startDownLoad.observerState(owner!!) {
-                onError = {
-                    println("failed ${it.message}")
-                }
-                onPrepare = {
-                    println("prepare")
-                }
-                onSuccess = {
-                    println("success $it")
-                }
-                onProgress = {
-                    println("progress:$it")
-                }
+        try {
+            val data = DownLoadManager.startDownLoad(coroutinesDownLoadRequest)
+            withContext(Dispatchers.Main) {
+                val lifecycleOwner: LifecycleOwner = owner
+                    ?: throw  Throwable("must need lifecycleOwner you can use lifecycle() to bind it ")
+                data.liveData.observerState(
+                    owner = lifecycleOwner,
+                    disposable = result,
+                    request = coroutinesDownLoadRequest
+                )
             }
+            MoyaLogTool.i("return result")
+            result
+        } catch (t: Throwable) {
+            MoyaLogTool.i("error : ${t.message}")
+            result
         }
-
-
-
     }
 }

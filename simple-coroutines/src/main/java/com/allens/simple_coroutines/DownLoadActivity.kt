@@ -17,6 +17,19 @@ class DownLoadActivity : BaseActivity() {
                             .path(getBasePath())
                             .build("http://tanzi27niu.cdsb.mobi/wps/wp-content/uploads/2017/05/2017-05-17_17-33-30.mp4")
                     )
+                    .doSuccess {
+                        println("success:$it")
+                    }
+                    .doFail {
+                        println("fail:${it.message}")
+                    }
+                    .doPrepare {
+                        println("prepare")
+                    }
+                    .onProgress {
+                        println("progress:$it")
+                    }
+
 
             }
         }

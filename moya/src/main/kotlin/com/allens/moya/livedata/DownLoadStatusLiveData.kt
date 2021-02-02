@@ -1,33 +1,40 @@
 package com.allens.moya.livedata
 
-import androidx.annotation.MainThread
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.MutableLiveData
+import com.allens.moya.impl.OnDownLoadListener
+import com.allens.moya.request.DownLoadRequest
+import com.allens.moya.result.DownLoadDisposable
 import com.allens.moya.result.DownLoadResult
-import com.allens.moya.result.DownLoadResultBuilder
 
 typealias DownLoadStatusLiveData<T> = MutableLiveData<DownLoadResult<T>>
 
 
 fun <T : Any> DownLoadStatusLiveData<T>.observerState(
     owner: LifecycleOwner,
-    init: DownLoadResultBuilder<T>.() -> Unit
+    disposable: DownLoadDisposable,
+    request: DownLoadRequest,
 ) {
-    println("observerState in ${Thread.currentThread().name}")
-    val result = DownLoadResultBuilder<T>().apply(init)
     observe(owner) { status ->
         when (status) {
             is DownLoadResult.Error -> {
-                result.onError.invoke(status.throwable)
+                disposable.onError.invoke(status.throwable)
+                request.listener?.onDownLoadError(request.tag ?: request.url, status.throwable)
             }
             is DownLoadResult.Success -> {
-                result.onSuccess.invoke(status.path)
+                disposable.onSuccess.invoke(status.path as String)
+                request.listener?.onDownLoadSuccess(
+                    key = request.tag ?: request.url,
+                    path = status.path as String
+                )
             }
             is DownLoadResult.Prepare -> {
-                result.onPrepare.invoke()
+                disposable.onPrepare.invoke()
+                request.listener?.onDownLoadPrepare(request.tag ?: request.url)
             }
             is DownLoadResult.Progress -> {
-                result.onProgress.invoke(status.progress)
+                disposable.onProgress.invoke(status.progress)
+                request.listener?.onDownLoadProgress(request.tag ?: request.url, status.progress)
             }
         }
     }
