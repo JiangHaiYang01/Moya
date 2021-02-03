@@ -1,15 +1,15 @@
 package com.allens.moya.livedata
 
+import androidx.annotation.MainThread
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.MutableLiveData
-import com.allens.moya.impl.OnDownLoadListener
 import com.allens.moya.request.DownLoadRequest
 import com.allens.moya.result.DownLoadDisposable
 import com.allens.moya.result.DownLoadResult
 
 typealias DownLoadStatusLiveData<T> = MutableLiveData<DownLoadResult<T>>
 
-
+@MainThread
 fun <T : Any> DownLoadStatusLiveData<T>.observerState(
     owner: LifecycleOwner,
     disposable: DownLoadDisposable,
@@ -22,10 +22,10 @@ fun <T : Any> DownLoadStatusLiveData<T>.observerState(
                 request.listener?.onDownLoadError(request.tag ?: request.url, status.throwable)
             }
             is DownLoadResult.Success -> {
-                disposable.onSuccess(status.path as String)
+                disposable.onSuccess(status.data as String)
                 request.listener?.onDownLoadSuccess(
                     key = request.tag ?: request.url,
-                    path = status.path as String
+                    path = status.data as String
                 )
             }
             is DownLoadResult.Prepare -> {

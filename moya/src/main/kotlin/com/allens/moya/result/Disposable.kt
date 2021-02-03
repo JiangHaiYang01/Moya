@@ -27,33 +27,4 @@ abstract class DownLoadDisposable : Disposable {
     fun doProgress(block: (Int) -> Unit) = apply {
         onProgress = block
     }
-
-    fun doTest() = apply {
-        println("doTest =====")
-    }
 }
-
-fun main() {
-
-    val test = Test()
-    test.doTest1{
-            println("haha =====")
-        }
-    Thread.sleep(1000)
-    test.test.invoke()
-}
-
-fun fuck(){
-    println("fuck")
-}
-
-class Test{
-
-    var test:()->Unit = {}
-
-    fun doTest1(block: () -> Unit) = apply {
-        println("doTest1 =====")
-        test = block
-    }
-}
-

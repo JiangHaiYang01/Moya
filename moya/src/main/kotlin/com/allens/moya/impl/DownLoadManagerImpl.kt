@@ -57,7 +57,7 @@ abstract class DownLoadManagerImpl<T : BasicDownLoadRequest> {
         val liveData = DownLoadStatusLiveData<String>()
         if (!check(request, liveData)) {
             MoyaLogTool.i("校验不通过")
-            return DownLoadData(liveData, null)
+            return DownLoadData(liveData)
         }
         MoyaLogTool.i("校验通过")
         MoyaLogTool.i("---->${Thread.currentThread().name}")

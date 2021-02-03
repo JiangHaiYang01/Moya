@@ -32,7 +32,6 @@ class DownLoadActivity : BaseActivity(), OnDownLoadListener {
                     .doProgress {
                         println("progress:$it")
                     }
-                    .doTest()
 
             }
         }
