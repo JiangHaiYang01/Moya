@@ -17,7 +17,7 @@ interface OnDownLoadProgressListener {
         read: Long,
         count: Long,
         done: Boolean
-    )
+    ){}
 }
 
 

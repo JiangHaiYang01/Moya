@@ -5,26 +5,20 @@ interface Disposable {
     fun dispose()
 }
 
+
+class DownLoadBuilder {
+    var onPrepare: () -> Unit = {}
+    var onProgress: (progress: Int) -> Unit = {}
+    var onSuccess: (path: String) -> Unit = {}
+    var onError: (Throwable) -> Unit = {}
+    var onCancel: () -> Unit = {}
+    var onPause: () -> Unit = {}
+
+}
+
 abstract class DownLoadDisposable : Disposable {
 
-    internal var onPrepare: () -> Unit = {}
-    internal var onProgress: (progress: Int) -> Unit = {}
-    internal var onSuccess: (path: String) -> Unit = {}
-    internal var onError: (Throwable) -> Unit = {}
+    abstract fun cancel()
 
-    fun doSuccess(block: (String) -> Unit) = apply {
-        onSuccess = block
-    }
-
-    fun doFail(block: (Throwable) -> Unit) = apply {
-        onError = block
-    }
-
-    fun doPrepare(block: () -> Unit) = apply {
-        onPrepare = block
-    }
-
-    fun doProgress(block: (Int) -> Unit) = apply {
-        onProgress = block
-    }
+    abstract fun pause()
 }

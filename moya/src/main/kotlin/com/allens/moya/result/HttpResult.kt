@@ -21,6 +21,14 @@ sealed class HttpResult<out T : Any> {
     }
 
 
+    //返回结果
+    fun get(): T? {
+        if (this is Success) {
+            return data
+        }
+        return null
+    }
+
     //请求成功
     @MainThread
     fun doSuccess(block: (T) -> Unit) = apply {

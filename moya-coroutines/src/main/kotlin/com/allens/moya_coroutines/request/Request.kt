@@ -4,6 +4,7 @@ import androidx.lifecycle.LifecycleOwner
 import com.allens.moya.livedata.observerState
 import com.allens.moya.result.Disposable
 import com.allens.moya.request.*
+import com.allens.moya.result.DownLoadBuilder
 import com.allens.moya.result.DownLoadDisposable
 import com.allens.moya.result.HttpResult
 import com.allens.moya.tools.MoyaLogTool
@@ -128,9 +129,11 @@ inline fun <reified T : Any> Request.Builder.doPut(
 //=============================================================
 // 下载
 //=============================================================
-suspend fun Request.Builder.doDownLoad(request: DownLoadRequest): DownLoadDisposable {
-    return withContext(Dispatchers.IO) {
-        val result = CoroutinesDownLoadDisposable(this)
+suspend fun Request.Builder.doDownLoad(
+    request: DownLoadRequest,
+    init: (DownLoadBuilder.() -> Unit)? = null
+) {
+    withContext(Dispatchers.IO) {
         val coroutinesDownLoadRequest = CoroutinesDownLoadRequest().also {
             it.coroutines = this
             it.url = request.url
@@ -146,15 +149,12 @@ suspend fun Request.Builder.doDownLoad(request: DownLoadRequest): DownLoadDispos
                     ?: throw  Throwable("must need lifecycleOwner you can use lifecycle() to bind it ")
                 data.liveData.observerState(
                     owner = lifecycleOwner,
-                    disposable = result,
-                    request = coroutinesDownLoadRequest
+                    request = coroutinesDownLoadRequest,
+                    init = init
                 )
             }
-            MoyaLogTool.i("return result")
-            result
         } catch (t: Throwable) {
             MoyaLogTool.i("error : ${t.message}")
-            result
         }
     }
 }
