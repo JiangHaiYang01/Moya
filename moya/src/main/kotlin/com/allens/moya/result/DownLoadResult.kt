@@ -9,8 +9,16 @@ sealed class DownLoadResult<out T : Any> {
     object Pause : DownLoadResult<Nothing>()
     data class Success<T : Any>(val data: T) : DownLoadResult<T>()
     data class Error(val throwable: Throwable) : DownLoadResult<Nothing>()
-    data class Progress(val progress: Int) : DownLoadResult<Nothing>()
+    data class Progress(
+        val progress: Int,
+        val read: Long,
+        val count: Long,
+        val done: Boolean
+    ) : DownLoadResult<Nothing>()
 
 }
 
-data class DownLoadData(var liveData: DownLoadStatusLiveData<String>, var disposable: Disposable? = null)
+data class DownLoadData(
+    var liveData: DownLoadStatusLiveData<String>,
+    var disposable: Disposable? = null
+)

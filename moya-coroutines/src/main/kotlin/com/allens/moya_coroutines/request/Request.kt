@@ -29,11 +29,6 @@ suspend fun Request.Builder.executeGet(parameter: String): String? {
     return getService(manager).doGet(heard, getUrl).string()
 }
 
-/**
- * @Describe get 请求
- * @param    [parameter] 请求地址,跟在BaseUrl 后面的
- * @return   @see [HttpResult]
- */
 suspend inline fun <reified T : Any> Request.Builder.doGet(
     parameter: String,
 ): HttpResult<T> = execute(manager) { executeGet(parameter) }
@@ -146,6 +141,7 @@ inline fun <reified T : Any> Request.Builder.doDelete(
     level = DeprecationLevel.WARNING,
     replaceWith = ReplaceWith(MoyaMessage.DELETE, imports = arrayOf(MoyaMessage.IMPORTS))
 )
+
 inline fun <reified T : Any> Request.Builder.doDeleteBlock(
     parameter: String,
     crossinline block: suspend (HttpResult<T>) -> Unit
@@ -187,6 +183,13 @@ inline fun <reified T : Any> Request.Builder.doPutBlock(
 //=============================================================
 // 下载
 //=============================================================
+//todo 1 因为livedata 导致的状态被刷新掉 而不能够接收到完整的进度  90% 就成功 但是下载进度不对
+//todo 2 如果绑定的viewModel 需要在其Clear 的时候 remove Observer
+//todo 3 如果什么都没绑定 需要在外部由用户去 remove Observer
+//todo 4 下载的队列以及优先级
+//todo 5 下载取消去暂停 如果在协程内部 用户自行cancel 了  需要在状态中感知到。并且抛出cancel的状态出去
+//todo 6 需要加上自行开启的协程块。
+//todo 7 下载的链式调用 需要考虑一下其他的方式 待定
 suspend fun Request.Builder.doDownLoad(
     request: DownLoadRequest,
     init: (DownLoadBuilder.() -> Unit)? = null
@@ -197,22 +200,18 @@ suspend fun Request.Builder.doDownLoad(
             it.url = request.url
             it.listener = request.listener
             it.name = request.name
+            it.tag = request.tag
             it.path = request.path
             it.manager = manager
         }
-        try {
-            val data = DownLoadManager.startDownLoad(coroutinesDownLoadRequest)
-            withContext(Dispatchers.Main) {
-                val lifecycleOwner: LifecycleOwner = owner
-                    ?: throw  Throwable("must need lifecycleOwner you can use lifecycle() to bind it ")
-                data.liveData.observerState(
-                    owner = lifecycleOwner,
-                    request = coroutinesDownLoadRequest,
-                    init = init
-                )
-            }
-        } catch (t: Throwable) {
-            MoyaLogTool.i("error : ${t.message}")
+        val data = DownLoadManager.startDownLoad(coroutinesDownLoadRequest)
+        withContext(Dispatchers.Main) {
+            data.liveData.observerState(
+                owner = owner,
+                viewModel = viewModel,
+                request = coroutinesDownLoadRequest,
+                init = init
+            )
         }
     }
 }

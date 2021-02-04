@@ -60,7 +60,7 @@ abstract class DownLoadManagerImpl<T : BasicDownLoadRequest> {
             return DownLoadData(liveData)
         }
         MoyaLogTool.i("校验通过")
-        MoyaLogTool.i("---->${Thread.currentThread().name}")
+        MoyaLogTool.i("当前线程---->${Thread.currentThread().name}")
         //准备下载
         changeStatus(liveData, DownLoadResult.Prepare)
         map[getKey(request)] = request
@@ -98,7 +98,15 @@ abstract class DownLoadManagerImpl<T : BasicDownLoadRequest> {
                     progress = { currentProgress, currentSaveLength, fileLength ->
                         //记录已经下载的长度
                         PrefTools.putLong(request, currentSaveLength)
-                        changeStatus(liveData, DownLoadResult.Progress(currentProgress))
+                        changeStatus(
+                            liveData,
+                            DownLoadResult.Progress(
+                                currentProgress,
+                                currentSaveLength,
+                                fileLength,
+                                done = currentSaveLength == fileLength
+                            )
+                        )
                     },
                     stop = {
                         stopSave(request)
@@ -109,6 +117,7 @@ abstract class DownLoadManagerImpl<T : BasicDownLoadRequest> {
             changeStatus(liveData, DownLoadResult.Error(t))
             PrefTools.remove(request)
         } finally {
+            MoyaLogTool.i("返回 disposable")
             return DownLoadData(liveData, disposable = disposable)
         }
     }

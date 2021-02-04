@@ -47,13 +47,13 @@ class TestActivity : BaseActivity() {
                 .lifecycle(this)
                 .doGet<String>("wxarticle/chapters/json") {
                     onSuccess = {
-
+                        log("success")
                     }
                     onError = {
-
+                        log("error")
                     }
                     onComplete = {
-
+                        log("complete")
                     }
                 }
         }
@@ -62,7 +62,7 @@ class TestActivity : BaseActivity() {
         lifecycle.addObserver(viewModel)
         addButton("Get 绑定ViewModel") {
             viewModel.doGet(moya)
-            finish()
+//            finish()
         }
     }
 }

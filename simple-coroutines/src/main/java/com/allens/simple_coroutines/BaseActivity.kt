@@ -11,19 +11,22 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelStoreOwner
 import com.allens.moya.Moya
 import com.allens.moya_coroutines.request.doGet
+import com.allens.moya_coroutines.request.doGetBlock
 import com.google.android.material.button.MaterialButton
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.MainScope
 import java.io.File
 
-abstract class BaseActivity : AppCompatActivity(), CoroutineScope by MainScope() {
+abstract class BaseActivity(private var layout: Int = R.layout.activity_main) :
+    AppCompatActivity(),
+    CoroutineScope by MainScope() {
     lateinit var linear: LinearLayout
 
     lateinit var moya: Moya
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        setContentView(layout)
         linear = findViewById(R.id.linear)
         moya = Moya.Builder()
             .baseUrl("https://www.wanandroid.com")
@@ -54,7 +57,7 @@ abstract class BaseActivity : AppCompatActivity(), CoroutineScope by MainScope()
     }
 
     //获取更路径
-     fun getBasePath(): String {
+    fun getBasePath(): String {
         var p: String = Environment.getExternalStorageState()
         val f: File? = getExternalFilesDir(null)
         if (null != f) {
@@ -69,7 +72,7 @@ class MainViewModel : ViewModel(), LifecycleObserver {
         moya.create()
             .parameter("k", "java")
             .viewModel(this)
-            .doGet<String>("wxarticle/chapters/json") {
+            .doGetBlock<String>("wxarticle/chapters/json") {
                 it.doSuccess { log("success") }
                 it.doFailed { log("error") }
                 it.doComplete { log("complete") }
