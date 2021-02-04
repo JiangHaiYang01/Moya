@@ -6,6 +6,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.viewModelScope
 import com.allens.moya.result.Disposable
 import com.allens.moya.manager.HttpManager
+import com.allens.moya.result.HttpBuilder
 import com.allens.moya.result.HttpResult
 import com.allens.moya_coroutines.impl.ApiService
 import kotlinx.coroutines.*
@@ -41,6 +42,29 @@ inline fun <reified T : Any> executeDisable(
         val result = decode<T>(manager) { action() }
         withContext(Dispatchers.Main) {
             block(result)
+        }
+    }
+    return CoroutinesDisposable(job)
+}
+
+
+inline fun <reified T : Any> executeDisable(
+    viewModel: ViewModel?,
+    lifecycle: LifecycleOwner?,
+    manager: HttpManager,
+    crossinline init: HttpBuilder<T>.() -> Unit,
+    crossinline action: suspend () -> String?
+): Disposable {
+    val job = executeRequest(viewModel = viewModel, lifecycleOwner = lifecycle) {
+        val result = decode<T>(manager) { action() }
+        withContext(Dispatchers.Main) {
+            val apply = HttpBuilder<T>().apply(init)
+            if (result is HttpResult.Success) {
+                apply.onSuccess(result.data)
+            } else if (result is HttpResult.Error) {
+                apply.onError(result.throwable)
+            }
+            apply.onComplete()
         }
     }
     return CoroutinesDisposable(job)

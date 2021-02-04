@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModelProvider
 import com.allens.moya.Moya
 import com.allens.moya_coroutines.request.doBody
 import com.allens.moya_coroutines.request.doGet
+import com.allens.moya_coroutines.request.doGetBlock
 import com.allens.simple_coroutines.bean.TestBean
 import kotlinx.coroutines.launch
 
@@ -34,12 +35,27 @@ class TestActivity : BaseActivity() {
                 .parameter("k", "java")
                 //必须绑定lifecycle
                 .lifecycle(this)
-                .doGet<String>("wxarticle/chapters/json") {
+                .doGetBlock<String>("wxarticle/chapters/json") {
                     it.doSuccess { log("success") }
                     it.doFailed { log("error") }
                     it.doComplete { log("complete") }
                 }
-            finish()
+
+            moya.create()
+                .parameter("k", "java")
+                //必须绑定lifecycle
+                .lifecycle(this)
+                .doGet<String>("wxarticle/chapters/json") {
+                    onSuccess = {
+
+                    }
+                    onError = {
+
+                    }
+                    onComplete = {
+
+                    }
+                }
         }
 
         val viewModel = createViewModel(this, MainViewModel::class.java)

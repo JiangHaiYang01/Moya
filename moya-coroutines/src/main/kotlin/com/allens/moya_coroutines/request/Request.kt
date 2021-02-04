@@ -2,11 +2,9 @@ package com.allens.moya_coroutines.request
 
 import androidx.lifecycle.LifecycleOwner
 import com.allens.moya.livedata.observerState
-import com.allens.moya.result.Disposable
+import com.allens.moya.message.MoyaMessage
 import com.allens.moya.request.*
-import com.allens.moya.result.DownLoadBuilder
-import com.allens.moya.result.DownLoadDisposable
-import com.allens.moya.result.HttpResult
+import com.allens.moya.result.*
 import com.allens.moya.tools.MoyaLogTool
 import com.allens.moya.tools.UrlTool
 import com.allens.moya_coroutines.manager.DownLoadManager
@@ -43,6 +41,18 @@ suspend inline fun <reified T : Any> Request.Builder.doGet(
 
 inline fun <reified T : Any> Request.Builder.doGet(
     parameter: String,
+    crossinline init: HttpBuilder<T>.() -> Unit
+): Disposable = executeDisable(viewModel, owner, manager, init) {
+    executeGet(parameter)
+}
+
+@Deprecated(
+    message = MoyaMessage.Deprecated,
+    level = DeprecationLevel.WARNING,
+    replaceWith = ReplaceWith(MoyaMessage.GET, imports = arrayOf(MoyaMessage.IMPORTS))
+)
+inline fun <reified T : Any> Request.Builder.doGetBlock(
+    parameter: String,
     crossinline block: suspend (HttpResult<T>) -> Unit
 ): Disposable = executeDisable(viewModel, owner, manager, block) {
     executeGet(parameter)
@@ -60,6 +70,18 @@ suspend inline fun <reified T : Any> Request.Builder.doPost(
 
 
 inline fun <reified T : Any> Request.Builder.doPost(
+    parameter: String,
+    crossinline init: HttpBuilder<T>.() -> Unit
+): Disposable = executeDisable(viewModel, owner, manager, init) {
+    executePost(parameter)
+}
+
+@Deprecated(
+    message = MoyaMessage.Deprecated,
+    level = DeprecationLevel.WARNING,
+    replaceWith = ReplaceWith(MoyaMessage.POST, imports = arrayOf(MoyaMessage.IMPORTS))
+)
+inline fun <reified T : Any> Request.Builder.doPostBlock(
     parameter: String,
     crossinline block: suspend (HttpResult<T>) -> Unit
 ): Disposable = executeDisable(viewModel, owner, manager, block) {
@@ -83,11 +105,23 @@ suspend inline fun <reified T : Any> Request.Builder.doBody(
 
 inline fun <reified T : Any> Request.Builder.doBody(
     parameter: String,
+    crossinline init: HttpBuilder<T>.() -> Unit
+): Disposable = executeDisable(viewModel, owner, manager, init) {
+    executeBody(parameter)
+}
+
+
+@Deprecated(
+    message = MoyaMessage.Deprecated,
+    level = DeprecationLevel.WARNING,
+    replaceWith = ReplaceWith(MoyaMessage.BODY, imports = arrayOf(MoyaMessage.IMPORTS))
+)
+inline fun <reified T : Any> Request.Builder.doBodyBlock(
+    parameter: String,
     crossinline block: suspend (HttpResult<T>) -> Unit
 ): Disposable = executeDisable(viewModel, owner, manager, block) {
     executeBody(parameter)
 }
-
 
 //=============================================================
 // delete
@@ -101,6 +135,18 @@ suspend inline fun <reified T : Any> Request.Builder.doDelete(
 
 
 inline fun <reified T : Any> Request.Builder.doDelete(
+    parameter: String,
+    crossinline init: HttpBuilder<T>.() -> Unit
+): Disposable = executeDisable(viewModel, owner, manager, init) {
+    executeDelete(parameter)
+}
+
+@Deprecated(
+    message = MoyaMessage.Deprecated,
+    level = DeprecationLevel.WARNING,
+    replaceWith = ReplaceWith(MoyaMessage.DELETE, imports = arrayOf(MoyaMessage.IMPORTS))
+)
+inline fun <reified T : Any> Request.Builder.doDeleteBlock(
     parameter: String,
     crossinline block: suspend (HttpResult<T>) -> Unit
 ): Disposable = executeDisable(viewModel, owner, manager, block) {
@@ -119,6 +165,18 @@ suspend inline fun <reified T : Any> Request.Builder.doPut(
 
 
 inline fun <reified T : Any> Request.Builder.doPut(
+    parameter: String,
+    crossinline init: HttpBuilder<T>.() -> Unit
+): Disposable = executeDisable(viewModel, owner, manager, init) {
+    executePut(parameter)
+}
+
+@Deprecated(
+    message = MoyaMessage.Deprecated,
+    level = DeprecationLevel.WARNING,
+    replaceWith = ReplaceWith(MoyaMessage.PUT, imports = arrayOf(MoyaMessage.IMPORTS))
+)
+inline fun <reified T : Any> Request.Builder.doPutBlock(
     parameter: String,
     crossinline block: suspend (HttpResult<T>) -> Unit
 ): Disposable = executeDisable(viewModel, owner, manager, block) {
