@@ -42,27 +42,32 @@ abstract class DownLoadManagerImpl<T : BasicDownLoadRequest> {
 
     //获取Key
     private fun getKey(request: DownLoadRequest): String {
-        return request.url
+        return request.tag ?: request.url
     }
 
+    @MainThread
     private fun <R : Any> changeStatus(
         liveData: DownLoadStatusLiveData<R>,
-        status: DownLoadResult<R>
+        status: DownLoadResult<R>,
+        request: T
     ) {
-        liveData.postValue(status)
+        //这里使用的是事件类型的LiveData 必须要用 setValue
+        request.manager.handler.post {
+            liveData.value = status
+        }
     }
 
     fun startDownLoad(request: T): DownLoadData {
         MoyaLogTool.i("准备开始校验是否合法")
         val liveData = DownLoadStatusLiveData<String>()
-        if (!check(request, liveData)) {
+        if (!check(request) { changeStatus(liveData, DownLoadResult.Error(it), request) }) {
             MoyaLogTool.i("校验不通过")
             return DownLoadData(liveData)
         }
         MoyaLogTool.i("校验通过")
         MoyaLogTool.i("当前线程---->${Thread.currentThread().name}")
         //准备下载
-        changeStatus(liveData, DownLoadResult.Prepare)
+        changeStatus(liveData, DownLoadResult.Prepare, request)
         map[getKey(request)] = request
         val file = File("${request.path}${File.separator}${request.name}")
         val currentLength = if (!file.exists()) {
@@ -75,7 +80,11 @@ abstract class DownLoadManagerImpl<T : BasicDownLoadRequest> {
         try {
             disposable = startRequest(request, currentLength) {
                 if (it == null) {
-                    changeStatus(liveData, DownLoadResult.Error(Throwable("response body is null")))
+                    changeStatus(
+                        liveData,
+                        DownLoadResult.Error(Throwable("response body is null")),
+                        request
+                    )
                     PrefTools.remove(request)
                     return@startRequest
                 }
@@ -86,13 +95,14 @@ abstract class DownLoadManagerImpl<T : BasicDownLoadRequest> {
                         map.remove(getKey(request))
                         changeStatus(
                             liveData,
-                            DownLoadResult.Error(Throwable("create DownLoad file error"))
+                            DownLoadResult.Error(Throwable("create DownLoad file error")),
+                            request
                         )
                     },
                     success = { path ->
                         PrefTools.remove(request)
                         map.remove(getKey(request))
-                        changeStatus(liveData, DownLoadResult.Success(path))
+                        changeStatus(liveData, DownLoadResult.Success(path), request)
 
                     },
                     progress = { currentProgress, currentSaveLength, fileLength ->
@@ -105,7 +115,8 @@ abstract class DownLoadManagerImpl<T : BasicDownLoadRequest> {
                                 currentSaveLength,
                                 fileLength,
                                 done = currentSaveLength == fileLength
-                            )
+                            ),
+                            request
                         )
                     },
                     stop = {
@@ -114,7 +125,7 @@ abstract class DownLoadManagerImpl<T : BasicDownLoadRequest> {
                 )
             }
         } catch (t: Throwable) {
-            changeStatus(liveData, DownLoadResult.Error(t))
+            changeStatus(liveData, DownLoadResult.Error(t), request)
             PrefTools.remove(request)
         } finally {
             MoyaLogTool.i("返回 disposable")
@@ -126,17 +137,14 @@ abstract class DownLoadManagerImpl<T : BasicDownLoadRequest> {
     //检查请求是否可以发送
     private fun <T : BasicDownLoadRequest> check(
         request: T,
-        liveData: DownLoadStatusLiveData<String>
+        error: (Throwable) -> Unit
     ): Boolean {
         MoyaLogTool.i("校验器size:${interceptors.size}")
         //拦截器
         interceptors
             .reversed()
             .forEach {
-                if (!it.onIntercept(request) { error ->
-                        //error from interceptor
-                        changeStatus(liveData, DownLoadResult.Error(error))
-                    }) {
+                if (!it.onIntercept(request) { error -> error(error) }) {
                     return false
                 }
             }

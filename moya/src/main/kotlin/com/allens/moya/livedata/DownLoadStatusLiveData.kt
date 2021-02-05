@@ -9,9 +9,8 @@ import com.allens.moya.result.DownLoadBuilder
 import com.allens.moya.result.DownLoadResult
 import com.allens.moya.tools.MoyaLogTool
 
-typealias DownLoadStatusLiveData<T> = MutableLiveData<DownLoadResult<T>>
+typealias DownLoadStatusLiveData<T> = EventLiveData<DownLoadResult<T>>
 
-@MainThread
 fun <T : Any> DownLoadStatusLiveData<T>.observerState(
     owner: LifecycleOwner? = null,
     viewModel: ViewModel? = null,

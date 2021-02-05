@@ -183,7 +183,7 @@ inline fun <reified T : Any> Request.Builder.doPutBlock(
 //=============================================================
 // 下载
 //=============================================================
-//todo 1 因为livedata 导致的状态被刷新掉 而不能够接收到完整的进度  90% 就成功 但是下载进度不对
+
 //todo 2 如果绑定的viewModel 需要在其Clear 的时候 remove Observer
 //todo 3 如果什么都没绑定 需要在外部由用户去 remove Observer
 //todo 4 下载的队列以及优先级
@@ -205,6 +205,9 @@ suspend fun Request.Builder.doDownLoad(
             it.manager = manager
         }
         val data = DownLoadManager.startDownLoad(coroutinesDownLoadRequest)
+        withContext(Dispatchers.Main){
+
+        }
         withContext(Dispatchers.Main) {
             data.liveData.observerState(
                 owner = owner,
