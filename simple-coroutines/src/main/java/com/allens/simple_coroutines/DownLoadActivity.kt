@@ -4,7 +4,9 @@ import android.os.Bundle
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.ViewModel
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.allens.moya.impl.OnDownLoadListener
@@ -15,9 +17,16 @@ import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
+
+class DownLoadViewModel : ViewModel() {
+
+}
+
 class DownLoadActivity : BaseActivity(), MyAdapter.OnBtnClickListener, OnDownLoadListener {
     private var data: MutableList<DownLoadInfo> = mutableListOf()
     private lateinit var myAdapter: MyAdapter
+
+    private val downLoadViewModel by viewModels<DownLoadViewModel>()
 
     companion object {
         const val TAG = "TAG"
@@ -84,7 +93,9 @@ class DownLoadActivity : BaseActivity(), MyAdapter.OnBtnClickListener, OnDownLoa
                 .listener(this@DownLoadActivity)
                 .build(info.url)
             moya.create()
-                .lifecycle(lifecycle = this@DownLoadActivity)
+                //绑定LiveData 后台将不会在更新
+//                .lifecycle(lifecycle = this@DownLoadActivity)
+                .viewModel(downLoadViewModel)
                 .doDownLoad(request)
         }
     }

@@ -45,13 +45,12 @@ abstract class DownLoadManagerImpl<T : BasicDownLoadRequest> {
         return request.tag ?: request.url
     }
 
-    @MainThread
     private fun <R : Any> changeStatus(
         liveData: DownLoadStatusLiveData<R>,
         status: DownLoadResult<R>,
         request: T
     ) {
-        //这里使用的是事件类型的LiveData 必须要用 setValue
+        //必须要用 setValue postValue 可能会将事件丢失
         request.manager.handler.post {
             liveData.value = status
         }
@@ -125,6 +124,7 @@ abstract class DownLoadManagerImpl<T : BasicDownLoadRequest> {
                 )
             }
         } catch (t: Throwable) {
+            MoyaLogTool.i("download error ${t.message}")
             changeStatus(liveData, DownLoadResult.Error(t), request)
             PrefTools.remove(request)
         } finally {

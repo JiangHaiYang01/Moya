@@ -20,7 +20,7 @@ class TestActivity : BaseActivity() {
                     .parameter("k", "java")
                     .doGet<String>("wxarticle/chapters/json")
                     .doFailed {
-                        log(it.message ?: "error")
+                        log("error : ${it.message}")
                     }
                     .doComplete {
                         log("complete")
@@ -30,7 +30,8 @@ class TestActivity : BaseActivity() {
                     }
             }
         }
-        addButton("Get 绑定lifeCycle") {
+
+        addButton("Block方式"){
             moya.create()
                 .parameter("k", "java")
                 //必须绑定lifecycle
@@ -40,7 +41,9 @@ class TestActivity : BaseActivity() {
                     it.doFailed { log("error") }
                     it.doComplete { log("complete") }
                 }
+        }
 
+        addButton("Get 绑定lifeCycle") {
             moya.create()
                 .parameter("k", "java")
                 //必须绑定lifecycle

@@ -8,9 +8,12 @@ import com.allens.moya.request.DownLoadRequest
 import com.allens.moya.result.DownLoadBuilder
 import com.allens.moya.result.DownLoadResult
 import com.allens.moya.tools.MoyaLogTool
+import java.beans.PropertyChangeSupport
 
-typealias DownLoadStatusLiveData<T> = EventLiveData<DownLoadResult<T>>
+typealias DownLoadStatusLiveData<T> = MutableLiveData<DownLoadResult<T>>
 
+
+@MainThread
 fun <T : Any> DownLoadStatusLiveData<T>.observerState(
     owner: LifecycleOwner? = null,
     viewModel: ViewModel? = null,
@@ -49,16 +52,18 @@ fun <T : Any> DownLoadStatusLiveData<T>.observerState(
     when {
         //如果传入了 lifecycle 就交给lifecycle控制，缺点是在后台的时候，不会在change变化
         owner != null -> {
-            observeEvent(owner, observer)
+            MoyaLogTool.i("lifecycle != null")
+            observe(owner, observer)
         }
         viewModel != null -> {
-//        observe(viewModel, observer)
+            MoyaLogTool.i("viewModel != null")
+            observeForever(observer)
         }
         else -> {
             //如果没有lifecycle 就需要自己在合适的实际 remove observer
             //好处就是可以在后台也刷新。不过没意义。因为一般的刷新进度都是给用户看的。
             //在后台了用户就看不到了
-            observeForeverEvent(observer)
+            observeForever(observer)
         }
     }
 }

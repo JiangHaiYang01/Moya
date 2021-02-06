@@ -37,7 +37,7 @@ object FileTool {
             fileLength - currentLength
         )
         val buffer = ByteArray(1024 * 4)
-        var len = 0
+        var len :Int
         var lastProgress = 0
         var currentSaveLength = currentLength //当前的长度
 
