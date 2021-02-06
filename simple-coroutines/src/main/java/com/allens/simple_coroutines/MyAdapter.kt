@@ -1,5 +1,6 @@
 package com.allens.simple_coroutines
 
+import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -74,6 +75,7 @@ class MyAdapter(
         getChildAt(key)?.findViewById<TextView>(R.id.bt_pause)?.text = "开始"
     }
 
+    @SuppressLint("SetTextI18n")
     fun setDownLoadProgress(
         key: String,
         progress: Int,

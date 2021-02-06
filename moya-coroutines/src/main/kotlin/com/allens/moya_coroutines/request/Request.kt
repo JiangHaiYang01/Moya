@@ -184,8 +184,6 @@ inline fun <reified T : Any> Request.Builder.doPutBlock(
 // 下载
 //=============================================================
 
-//todo 2 如果绑定的viewModel 需要在其Clear 的时候 remove Observer
-//todo 3 如果什么都没绑定 需要在外部由用户去 remove Observer
 //todo 4 下载的队列以及优先级
 //todo 5 下载取消去暂停 如果在协程内部 用户自行cancel 了  需要在状态中感知到。并且抛出cancel的状态出去
 //todo 6 需要加上自行开启的协程块。
@@ -210,7 +208,6 @@ suspend fun Request.Builder.doDownLoad(
         withContext(Dispatchers.Main) {
             data.liveData.observerState(
                 owner = owner,
-                viewModel = viewModel,
                 request = coroutinesDownLoadRequest,
                 init = init
             )

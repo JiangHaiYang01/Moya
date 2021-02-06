@@ -1,9 +1,7 @@
 package com.allens.moya.livedata
 
 import androidx.annotation.MainThread
-import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
+import androidx.lifecycle.*
 import com.allens.moya.request.DownLoadRequest
 import com.allens.moya.result.DownLoadBuilder
 import com.allens.moya.result.DownLoadResult
@@ -26,7 +24,7 @@ fun <T : Any> DownLoadStatusLiveData<T>.observerState(
     } else {
         null
     }
-    val observer: (t: DownLoadResult<T>) -> Unit = { status ->
+    val function: (t: DownLoadResult<T>) -> Unit = { status ->
         when (status) {
             is DownLoadResult.Error -> {
                 changeFromError(result, status, request)
@@ -48,16 +46,22 @@ fun <T : Any> DownLoadStatusLiveData<T>.observerState(
             }
         }
     }
-
+    val observer = Observer(function)
     when {
-        //如果传入了 lifecycle 就交给lifecycle控制，缺点是在后台的时候，不会在change变化
-        owner != null -> {
-            MoyaLogTool.i("lifecycle != null")
-            observe(owner, observer)
-        }
-        viewModel != null -> {
-            MoyaLogTool.i("viewModel != null")
+        viewModel != null && owner != null -> {
+            //todo 这里需要想一下 是否需要这么做，还是舍弃这种方式。是否有必要！
             observeForever(observer)
+            owner.lifecycle.addObserver(object : LifecycleEventObserver {
+                override fun onStateChanged(source: LifecycleOwner, event: Lifecycle.Event) {
+                    if (event == Lifecycle.Event.ON_DESTROY) {
+                        removeObserver(observer)
+                    }
+                }
+            })
+        }
+        owner != null -> {
+            //如果传入了 lifecycle 就交给lifecycle控制，缺点是在后台的时候，不会在change变化
+            observe(owner, observer)
         }
         else -> {
             //如果没有lifecycle 就需要自己在合适的实际 remove observer
