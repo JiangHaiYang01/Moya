@@ -18,7 +18,7 @@ sealed class DownLoadResult<out T : Any> {
 
 }
 
-data class DownLoadData(
-    var liveData: DownLoadStatusLiveData<String>,
-    var disposable: Disposable? = null
+data class DownLoadData<T : Disposable>(
+    var liveData: DownLoadStatusLiveData<String>? = null,
+    var disposable: T? = null
 )

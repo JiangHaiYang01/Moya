@@ -21,10 +21,3 @@ class DownLoadBuilder {
     var onPause: () -> Unit = {}
 
 }
-
-abstract class DownLoadDisposable : Disposable {
-
-    abstract fun cancel()
-
-    abstract fun pause()
-}

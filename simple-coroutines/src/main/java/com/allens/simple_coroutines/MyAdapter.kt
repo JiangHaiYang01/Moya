@@ -8,10 +8,11 @@ import android.widget.Button
 import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import com.allens.moya.request.DownLoadRequest
 
 
 class MyAdapter(
-    private val mData: List<DownLoadInfo>,
+    private val mData: List<DownLoadRequest>,
     private val mRecyclerView: RecyclerView
 ) :
     RecyclerView.Adapter<MyAdapter.MyViewHolder>() {
@@ -28,6 +29,10 @@ class MyAdapter(
             else
                 onBtnClickListener?.onItemClickPause(mData[position])
         }
+
+        holder.btnCancel.setOnClickListener {
+            onBtnClickListener?.onItemClickCancel(mData[position])
+        }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyViewHolder {
@@ -40,6 +45,7 @@ class MyAdapter(
 
         var tvStatus: TextView = itemView.findViewById(R.id.tv_waiting)
         var btnStart: Button = itemView.findViewById(R.id.bt_pause)
+        var btnCancel: Button = itemView.findViewById(R.id.bt_cancel)
 
     }
 
@@ -47,8 +53,9 @@ class MyAdapter(
     private var onBtnClickListener: OnBtnClickListener? = null
 
     interface OnBtnClickListener {
-        fun onItemClickStart(info: DownLoadInfo)
-        fun onItemClickPause(downLoadInfo: DownLoadInfo)
+        fun onItemClickStart(request: DownLoadRequest)
+        fun onItemClickPause(request: DownLoadRequest)
+        fun onItemClickCancel(request: DownLoadRequest)
     }
 
     fun setOnBtnClickListener(listener: OnBtnClickListener) {
@@ -63,7 +70,7 @@ class MyAdapter(
 
     private fun getChildAt(key: String): View? {
         for ((index, data) in mData.withIndex()) {
-            if (data.key == key) {
+            if (data.tag ?: data.url == key) {
                 return mRecyclerView.getChildAt(index)
             }
         }

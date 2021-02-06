@@ -1,32 +1,27 @@
 package com.allens.simple_coroutines
 
-import android.os.Bundle
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
-import androidx.activity.viewModels
-import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModel
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.allens.moya.impl.OnDownLoadListener
 import com.allens.moya.request.DownLoadRequest
 import com.allens.moya.tools.toKB
+import com.allens.moya_coroutines.request.cancelDownLoad
 import com.allens.moya_coroutines.request.doDownLoad
+import com.allens.moya_coroutines.request.pauseDownLoad
 import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 
-class DownLoadViewModel : ViewModel() {
-
-}
-
 class DownLoadActivity : BaseActivity(), MyAdapter.OnBtnClickListener, OnDownLoadListener {
-    private var data: MutableList<DownLoadInfo> = mutableListOf()
+    private var data: MutableList<DownLoadRequest> = mutableListOf()
     private lateinit var myAdapter: MyAdapter
 
-    private val downLoadViewModel by viewModels<DownLoadViewModel>()
+//    private val downLoadViewModel by viewModels<DownLoadViewModel>()
 
     companion object {
         const val TAG = "TAG"
@@ -45,7 +40,12 @@ class DownLoadActivity : BaseActivity(), MyAdapter.OnBtnClickListener, OnDownLoa
 
         for ((index, info) in downloadUrl.withIndex()) {
             data.add(
-                DownLoadInfo(info, "$index", "key=$index")
+                DownLoadRequest.Builder()
+                    .name(".$index")
+                    .path(getBasePath())
+                    .tag("tag->$index")
+                    .listener(this@DownLoadActivity)
+                    .build(info)
             )
         }
 
@@ -84,23 +84,25 @@ class DownLoadActivity : BaseActivity(), MyAdapter.OnBtnClickListener, OnDownLoa
         return super.onOptionsItemSelected(item)
     }
 
-    override fun onItemClickStart(info: DownLoadInfo) {
+    override fun onItemClickStart(request: DownLoadRequest) {
         launch {
-            val request = DownLoadRequest.Builder()
-                .name(info.saveName)
-                .path(getBasePath())
-                .tag(info.key)
-                .listener(this@DownLoadActivity)
-                .build(info.url)
+
             moya.create()
                 //绑定LiveData 后台将不会在更新
-//                .lifecycle(lifecycle = this@DownLoadActivity)
-                .viewModel(downLoadViewModel)
+                .lifecycle(lifecycle = this@DownLoadActivity)
+//                .viewModel(downLoadViewModel)
                 .doDownLoad(request)
         }
     }
 
-    override fun onItemClickPause(downLoadInfo: DownLoadInfo) {
+    override fun onItemClickPause(request: DownLoadRequest) {
+        Log.i(TAG, "准备暂停下载")
+        moya.create().pauseDownLoad(request)
+    }
+
+    override fun onItemClickCancel(request: DownLoadRequest) {
+        Log.i(TAG, "准备取消下载")
+        moya.create().cancelDownLoad(request)
     }
 
     override fun onDownLoadPrepare(key: String) {
@@ -110,7 +112,6 @@ class DownLoadActivity : BaseActivity(), MyAdapter.OnBtnClickListener, OnDownLoa
 
 
     override fun onDownLoadProgress(key: String, progress: Int) {
-//        Log.i(TAG, "下载进度 $progress  thread ${Thread.currentThread().name}")
 
     }
 
@@ -150,5 +151,3 @@ class DownLoadActivity : BaseActivity(), MyAdapter.OnBtnClickListener, OnDownLoa
 
 
 }
-
-data class DownLoadInfo(val url: String, val saveName: String, val key: String)

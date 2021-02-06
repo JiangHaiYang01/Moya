@@ -11,20 +11,17 @@ import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import okhttp3.ResponseBody
 
-object DownLoadManager : DownLoadManagerImpl<CoroutinesDownLoadRequest>() {
+object DownLoadManager : DownLoadManagerImpl<CoroutinesDownLoadRequest, CoroutinesDisposable>() {
     override fun addInterceptor(): MutableSet<OnDownLoadInterceptor> {
         return mutableSetOf()
     }
 
-    override fun stopSave(request: CoroutinesDownLoadRequest): Boolean {
-        return !request.coroutines.isActive
-    }
 
     override fun startRequest(
         request: CoroutinesDownLoadRequest,
         currentLength: Long,
         block: (ResponseBody?) -> Unit
-    ): Disposable {
+    ): CoroutinesDisposable {
         val job = request.coroutines.launch(Dispatchers.IO) {
             val response = request.manager.getServiceWithOutLogInterceptor<ApiService>()
                 .downloadFile("bytes=$currentLength-", request.url)

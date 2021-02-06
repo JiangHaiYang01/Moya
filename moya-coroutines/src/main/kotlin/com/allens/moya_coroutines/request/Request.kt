@@ -1,14 +1,18 @@
 package com.allens.moya_coroutines.request
 
-import androidx.lifecycle.LifecycleOwner
+import android.app.DownloadManager
+import androidx.annotation.MainThread
 import com.allens.moya.livedata.observerState
+import com.allens.moya.manager.HttpManager
 import com.allens.moya.message.MoyaMessage
 import com.allens.moya.request.*
 import com.allens.moya.result.*
 import com.allens.moya.tools.MoyaLogTool
 import com.allens.moya.tools.UrlTool
 import com.allens.moya_coroutines.manager.DownLoadManager
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.NonCancellable.cancel
 import kotlinx.coroutines.withContext
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.RequestBody.Companion.toRequestBody
@@ -194,19 +198,10 @@ suspend fun Request.Builder.doDownLoad(
     init: (DownLoadBuilder.() -> Unit)? = null
 ) {
     withContext(Dispatchers.IO) {
-        val coroutinesDownLoadRequest = CoroutinesDownLoadRequest().also {
-            it.coroutines = this
-            it.url = request.url
-            it.listener = request.listener
-            it.name = request.name
-            it.tag = request.tag
-            it.path = request.path
-            it.manager = manager
-        }
-
+        val coroutinesDownLoadRequest = convertToCoroutinesRequest(request, this)
         val data = DownLoadManager.startDownLoad(coroutinesDownLoadRequest)
         withContext(Dispatchers.Main) {
-            data.liveData.observerState(
+            data.liveData?.observerState(
                 owner = owner,
                 request = coroutinesDownLoadRequest,
                 init = init
@@ -214,3 +209,31 @@ suspend fun Request.Builder.doDownLoad(
         }
     }
 }
+
+private fun Request.Builder.convertToCoroutinesRequest(
+    request: DownLoadRequest,
+    scope: CoroutineScope? = null
+): CoroutinesDownLoadRequest {
+    return CoroutinesDownLoadRequest().also {
+        if (scope != null) {
+            it.coroutines = scope
+        }
+        it.url = request.url
+        it.listener = request.listener
+        it.name = request.name
+        it.tag = request.tag
+        it.path = request.path
+        it.manager = manager
+    }
+}
+
+//如果在请求的时候没有tag 则使用url 作为key
+fun Request.Builder.cancelDownLoad(request: DownLoadRequest) {
+    DownLoadManager.cancel(convertToCoroutinesRequest(request))
+}
+
+fun Request.Builder.pauseDownLoad(request: DownLoadRequest) {
+    DownLoadManager.pause(convertToCoroutinesRequest(request))
+}
+
+
