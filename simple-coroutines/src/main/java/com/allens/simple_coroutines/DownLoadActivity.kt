@@ -41,7 +41,8 @@ class DownLoadActivity : BaseActivity(), MyAdapter.OnBtnClickListener, OnDownLoa
                     .name(".$index")
                     .path(getBasePath())
                     .tag("tag->$index")
-                    .listener(this@DownLoadActivity)
+                    //可以选择不用 listener 参考下面方式2
+//                    .listener(this@DownLoadActivity)
                     .build(info)
             )
         }
@@ -81,29 +82,66 @@ class DownLoadActivity : BaseActivity(), MyAdapter.OnBtnClickListener, OnDownLoa
         return super.onOptionsItemSelected(item)
     }
 
-    override fun onItemClickStart(request: DownLoadRequest) {
-        launch {
 
+    //方式1
+    private fun type1(request: DownLoadRequest){
+        launch {
             moya.create()
                 //绑定LiveData 后台将不会在更新
                 .lifecycle(lifecycle = this@DownLoadActivity)
-//                .viewModel(downLoadViewModel)
                 .doDownLoad(request)
         }
     }
 
+    private fun type2(request:DownLoadRequest){
+        launch {
+            val tag = request.tag ?: request.url
+            moya.create()
+                .lifecycle(this@DownLoadActivity)
+                .doDownLoad(request) {
+                    onSuccess = {
+                        myAdapter.setDownLoadSuccess(tag, it)
+                    }
+                    onCancel = {
+                        myAdapter.setDownLoadCancel(tag)
+                    }
+                    onPause = {
+                        myAdapter.setDownLoadPause(tag)
+                    }
+                    onUpdate = { progress, read, count, done ->
+                        myAdapter.setDownLoadProgress(
+                            tag,
+                            progress,
+                            read.toKB(),
+                            count.toKB(),
+                            done
+                        )
+                    }
+                    onError = {
+                        myAdapter.setDownLoadError(tag, it)
+                    }
+                    onPrepare = {
+                        myAdapter.setDownLoadPrepare(tag)
+                    }
+
+                }
+        }
+    }
+
+    override fun onItemClickStart(request: DownLoadRequest) {
+//        type1(request)
+        type2(request)
+    }
+
     override fun onItemClickPause(request: DownLoadRequest) {
-        Log.i(TAG, "准备暂停下载")
         moya.create().doPauseDownLoad(request)
     }
 
     override fun onItemClickCancel(request: DownLoadRequest) {
-        Log.i(TAG, "准备取消下载")
         moya.create().doCancelDownLoad(request)
     }
 
     override fun onDownLoadPrepare(key: String) {
-        Log.i(TAG, "准备下载 $key  thread ${Thread.currentThread().name}")
         myAdapter.setDownLoadPrepare(key)
     }
 
@@ -113,30 +151,22 @@ class DownLoadActivity : BaseActivity(), MyAdapter.OnBtnClickListener, OnDownLoa
     }
 
     override fun onDownLoadError(key: String, throwable: Throwable) {
-        Log.i(TAG, "下载失败 ${throwable.message}  thread ${Thread.currentThread().name}")
         myAdapter.setDownLoadError(key, throwable)
     }
 
     override fun onDownLoadSuccess(key: String, path: String) {
-        Log.i(TAG, "下载成功 $key  thread ${Thread.currentThread().name}")
         myAdapter.setDownLoadSuccess(key, path)
     }
 
     override fun onDownLoadPause(key: String) {
-        Log.i(TAG, "下载暂停 $key  thread ${Thread.currentThread().name}")
         myAdapter.setDownLoadPause(key)
     }
 
     override fun onDownLoadCancel(key: String) {
-        Log.i(TAG, "下载取消 $key  thread ${Thread.currentThread().name}")
         myAdapter.setDownLoadCancel(key)
     }
 
     override fun onUpdate(key: String, progress: Int, read: Long, count: Long, done: Boolean) {
-        Log.i(
-            TAG,
-            "下载进度 $key  progress:$progress read:$read  count:$count  done:$done thread:${Thread.currentThread().name}"
-        )
         myAdapter.setDownLoadProgress(
             key,
             progress,

@@ -27,21 +27,27 @@ fun <T : Any> DownLoadStatusLiveData<T>.observerState(
     val function: (t: DownLoadResult<T>) -> Unit = { status ->
         when (status) {
             is DownLoadResult.Error -> {
+                MoyaLogTool.i("下载失败 ${status.throwable.message}")
                 changeFromError(result, status, request)
             }
             is DownLoadResult.Success -> {
+                MoyaLogTool.i("下载成功 保存位置 ${status.data}")
                 changeFromSuccess(result, status, request)
             }
             is DownLoadResult.Prepare -> {
+                MoyaLogTool.i("准备下载请求")
                 changeFromPrepare(result, request)
             }
             is DownLoadResult.Progress -> {
+                MoyaLogTool.i("下载进度 ${status.progress}")
                 changeFromProgress(result, status, request)
             }
             is DownLoadResult.Cancel -> {
+                MoyaLogTool.i("下载取消")
                 changeFromCancel(result, request)
             }
             is DownLoadResult.Pause -> {
+                MoyaLogTool.i("下载暂停")
                 changeFromPause(result, request)
             }
         }
