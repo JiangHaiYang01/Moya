@@ -1,5 +1,6 @@
 package com.allens.moya.impl
 
+import androidx.annotation.MainThread
 import com.allens.moya.interceptor.ParameterInterceptor
 import com.allens.moya.livedata.DownLoadStatusLiveData
 import com.allens.moya.request.BasicDownLoadRequest
@@ -47,6 +48,15 @@ abstract class DownLoadManagerImpl<T : BasicDownLoadRequest, R : Disposable> {
         cancelOrPause(request, DownLoadResult.Pause)
     }
 
+    fun pauseAll() {
+        cancelOrPauseAll(DownLoadResult.Pause)
+    }
+
+    fun cancelAll() {
+        cancelOrPauseAll(DownLoadResult.Cancel)
+    }
+
+
     //取消下载
     fun cancel(request: T) {
         PrefTools.remove(request)
@@ -61,6 +71,14 @@ abstract class DownLoadManagerImpl<T : BasicDownLoadRequest, R : Disposable> {
                 changeStatus(liveData, status, request)
                 downLoadData.disposable?.dispose()
             }
+        }
+    }
+
+    @MainThread
+    private fun cancelOrPauseAll(status: DownLoadResult<String>) {
+        map.forEach {
+            it.value.liveData?.value = status
+            it.value.disposable?.dispose()
         }
     }
 

@@ -8,9 +8,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.allens.moya.impl.OnDownLoadListener
 import com.allens.moya.request.DownLoadRequest
 import com.allens.moya.tools.toKB
-import com.allens.moya_coroutines.request.doCancelDownLoad
-import com.allens.moya_coroutines.request.doDownLoad
-import com.allens.moya_coroutines.request.doPauseDownLoad
+import com.allens.moya_coroutines.request.*
 import kotlinx.coroutines.launch
 
 
@@ -67,15 +65,15 @@ class DownLoadActivity : BaseActivity(), MyAdapter.OnBtnClickListener, OnDownLoa
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             1 -> {
-//                for (info in data) {
-//                    startDownLoad(info)
-//                }
+                for (info in data) {
+                    onItemClickStart(info)
+                }
             }
             2 -> {
-//                moya.create().doDownLoadPauseAll()
+                moya.create().doDownLoadPauseAll()
             }
             3 -> {
-//                moya.create().doDownLoadCancelAll()
+                moya.create().doDownLoadCancelAll()
             }
 
         }
@@ -84,7 +82,7 @@ class DownLoadActivity : BaseActivity(), MyAdapter.OnBtnClickListener, OnDownLoa
 
 
     //方式1
-    private fun type1(request: DownLoadRequest){
+    private fun type1(request: DownLoadRequest) {
         launch {
             moya.create()
                 //绑定LiveData 后台将不会在更新
@@ -93,7 +91,7 @@ class DownLoadActivity : BaseActivity(), MyAdapter.OnBtnClickListener, OnDownLoa
         }
     }
 
-    private fun type2(request:DownLoadRequest){
+    private fun type2(request: DownLoadRequest) {
         launch {
             val tag = request.tag ?: request.url
             moya.create()

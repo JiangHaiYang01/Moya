@@ -237,3 +237,11 @@ fun Request.Builder.doPauseDownLoad(request: DownLoadRequest) {
 }
 
 
+fun Request.Builder.doDownLoadCancelAll() {
+    DownLoadManager.cancelAll()
+}
+
+fun Request.Builder.doDownLoadPauseAll() {
+    DownLoadManager.pauseAll()
+}
+
