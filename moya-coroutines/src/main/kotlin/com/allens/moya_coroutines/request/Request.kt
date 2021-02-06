@@ -228,11 +228,11 @@ private fun Request.Builder.convertToCoroutinesRequest(
 }
 
 //如果在请求的时候没有tag 则使用url 作为key
-fun Request.Builder.cancelDownLoad(request: DownLoadRequest) {
+fun Request.Builder.doCancelDownLoad(request: DownLoadRequest) {
     DownLoadManager.cancel(convertToCoroutinesRequest(request))
 }
 
-fun Request.Builder.pauseDownLoad(request: DownLoadRequest) {
+fun Request.Builder.doPauseDownLoad(request: DownLoadRequest) {
     DownLoadManager.pause(convertToCoroutinesRequest(request))
 }
 

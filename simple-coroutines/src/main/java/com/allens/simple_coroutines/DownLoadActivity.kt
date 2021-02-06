@@ -3,17 +3,14 @@ package com.allens.simple_coroutines
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
-import androidx.lifecycle.ViewModel
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.allens.moya.impl.OnDownLoadListener
 import com.allens.moya.request.DownLoadRequest
 import com.allens.moya.tools.toKB
-import com.allens.moya_coroutines.request.cancelDownLoad
+import com.allens.moya_coroutines.request.doCancelDownLoad
 import com.allens.moya_coroutines.request.doDownLoad
-import com.allens.moya_coroutines.request.pauseDownLoad
-import kotlinx.coroutines.cancelAndJoin
-import kotlinx.coroutines.delay
+import com.allens.moya_coroutines.request.doPauseDownLoad
 import kotlinx.coroutines.launch
 
 
@@ -97,12 +94,12 @@ class DownLoadActivity : BaseActivity(), MyAdapter.OnBtnClickListener, OnDownLoa
 
     override fun onItemClickPause(request: DownLoadRequest) {
         Log.i(TAG, "准备暂停下载")
-        moya.create().pauseDownLoad(request)
+        moya.create().doPauseDownLoad(request)
     }
 
     override fun onItemClickCancel(request: DownLoadRequest) {
         Log.i(TAG, "准备取消下载")
-        moya.create().cancelDownLoad(request)
+        moya.create().doCancelDownLoad(request)
     }
 
     override fun onDownLoadPrepare(key: String) {
