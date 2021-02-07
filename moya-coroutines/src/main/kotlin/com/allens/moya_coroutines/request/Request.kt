@@ -1,18 +1,13 @@
 package com.allens.moya_coroutines.request
 
-import android.app.DownloadManager
-import androidx.annotation.MainThread
 import com.allens.moya.livedata.observerState
-import com.allens.moya.manager.HttpManager
 import com.allens.moya.message.MoyaMessage
 import com.allens.moya.request.*
 import com.allens.moya.result.*
-import com.allens.moya.tools.MoyaLogTool
 import com.allens.moya.tools.UrlTool
-import com.allens.moya_coroutines.manager.DownLoadManager
+import com.allens.moya_coroutines.manager.CoroutinesDownLoadManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.NonCancellable.cancel
 import kotlinx.coroutines.withContext
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.RequestBody.Companion.toRequestBody
@@ -187,19 +182,16 @@ inline fun <reified T : Any> Request.Builder.doPutBlock(
 //=============================================================
 // 下载
 //=============================================================
-
-//todo 4 下载的队列以及优先级
-//todo 5 下载取消去暂停 如果在协程内部 用户自行cancel 了  需要在状态中感知到。并且抛出cancel的状态出去
-//todo 6 需要加上自行开启的协程块。
 suspend fun Request.Builder.doDownLoad(
     request: DownLoadRequest,
     init: (DownLoadBuilder.() -> Unit)? = null
 ) {
     withContext(Dispatchers.IO) {
         val coroutinesDownLoadRequest = convertToCoroutinesRequest(request, this)
-        val data = DownLoadManager.startDownLoad(coroutinesDownLoadRequest)
+        val data = CoroutinesDownLoadManager.startDownLoad(coroutinesDownLoadRequest)
         withContext(Dispatchers.Main) {
             data.liveData?.observerState(
+                manager = CoroutinesDownLoadManager,
                 owner = owner,
                 request = coroutinesDownLoadRequest,
                 init = init
@@ -227,19 +219,22 @@ private fun Request.Builder.convertToCoroutinesRequest(
 
 //如果在请求的时候没有tag 则使用url 作为key
 fun Request.Builder.doCancelDownLoad(request: DownLoadRequest) {
-    DownLoadManager.cancel(convertToCoroutinesRequest(request))
+    CoroutinesDownLoadManager.cancel(convertToCoroutinesRequest(request))
 }
 
+//暂停某一个请求的下载
 fun Request.Builder.doPauseDownLoad(request: DownLoadRequest) {
-    DownLoadManager.pause(convertToCoroutinesRequest(request))
+    CoroutinesDownLoadManager.pause(convertToCoroutinesRequest(request))
 }
 
 
+//全部取消下载
 fun Request.Builder.doDownLoadCancelAll() {
-    DownLoadManager.cancelAll()
+    CoroutinesDownLoadManager.cancelAll()
 }
 
+//全部终止下载
 fun Request.Builder.doDownLoadPauseAll() {
-    DownLoadManager.pauseAll()
+    CoroutinesDownLoadManager.pauseAll()
 }
 

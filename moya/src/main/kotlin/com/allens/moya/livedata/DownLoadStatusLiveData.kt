@@ -2,19 +2,22 @@ package com.allens.moya.livedata
 
 import androidx.annotation.MainThread
 import androidx.lifecycle.*
+import com.allens.moya.impl.DownLoadManagerImpl
+import com.allens.moya.request.BasicDownLoadRequest
 import com.allens.moya.request.DownLoadRequest
+import com.allens.moya.request.getKey
+import com.allens.moya.result.Disposable
 import com.allens.moya.result.DownLoadBuilder
 import com.allens.moya.result.DownLoadResult
 import com.allens.moya.tools.MoyaLogTool
-import java.beans.PropertyChangeSupport
 
-typealias DownLoadStatusLiveData<T> = MutableLiveData<DownLoadResult<T>>
+typealias DownLoadStatusLiveData = MutableLiveData<DownLoadResult>
 
 
 @MainThread
-fun <T : Any> DownLoadStatusLiveData<T>.observerState(
+fun <T : BasicDownLoadRequest, R : Disposable> DownLoadStatusLiveData.observerState(
+    manager: DownLoadManagerImpl<T, R>,
     owner: LifecycleOwner? = null,
-    viewModel: ViewModel? = null,
     request: DownLoadRequest,
     init: (DownLoadBuilder.() -> Unit)? = null
 ) {
@@ -24,7 +27,7 @@ fun <T : Any> DownLoadStatusLiveData<T>.observerState(
     } else {
         null
     }
-    val function: (t: DownLoadResult<T>) -> Unit = { status ->
+    val function: (t: DownLoadResult) -> Unit = { status ->
         when (status) {
             is DownLoadResult.Error -> {
                 MoyaLogTool.i("下载失败 ${status.throwable.message}")
@@ -54,26 +57,23 @@ fun <T : Any> DownLoadStatusLiveData<T>.observerState(
     }
     val observer = Observer(function)
     when {
-        viewModel != null && owner != null -> {
-            //todo 这里需要想一下 是否需要这么做，还是舍弃这种方式。是否有必要！
-            observeForever(observer)
+        owner != null -> {
+            //如果传入了 lifecycle 就交给lifecycle控制，缺点是在后台的时候，不会在change变化
+            observe(owner, observer)
             owner.lifecycle.addObserver(object : LifecycleEventObserver {
                 override fun onStateChanged(source: LifecycleOwner, event: Lifecycle.Event) {
                     if (event == Lifecycle.Event.ON_DESTROY) {
-                        removeObserver(observer)
+                        manager.observer.remove(request.getKey())
                     }
                 }
             })
         }
-        owner != null -> {
-            //如果传入了 lifecycle 就交给lifecycle控制，缺点是在后台的时候，不会在change变化
-            observe(owner, observer)
-        }
         else -> {
             //如果没有lifecycle 就需要自己在合适的实际 remove observer
             //好处就是可以在后台也刷新。不过没意义。因为一般的刷新进度都是给用户看的。
-            //在后台了用户就看不到了
+            //在后台了用户就看不到了 需要用户自行去remove
             observeForever(observer)
+            manager.observer[request.getKey()] = Pair(this, observer)
         }
     }
 }
@@ -83,7 +83,7 @@ private fun changeFromPause(
     request: DownLoadRequest
 ) {
     result?.onPause?.invoke()
-    request.listener?.onDownLoadPause(key = request.tag ?: request.url)
+    request.listener?.onDownLoadPause(request.getKey())
 }
 
 private fun changeFromCancel(
@@ -91,7 +91,7 @@ private fun changeFromCancel(
     request: DownLoadRequest
 ) {
     result?.onCancel?.invoke()
-    request.listener?.onDownLoadCancel(key = request.tag ?: request.url)
+    request.listener?.onDownLoadCancel(request.getKey())
 }
 
 private fun changeFromProgress(
@@ -100,7 +100,7 @@ private fun changeFromProgress(
     request: DownLoadRequest
 ) {
     result?.onProgress?.invoke(status.progress)
-    request.listener?.onDownLoadProgress(request.tag ?: request.url, status.progress)
+    request.listener?.onDownLoadProgress(request.getKey(), status.progress)
     result?.onUpdate?.invoke(
         status.progress,
         status.read,
@@ -108,7 +108,7 @@ private fun changeFromProgress(
         status.done
     )
     request.listener?.onUpdate(
-        request.tag ?: request.url,
+        request.getKey(),
         status.progress,
         status.read,
         status.count,
@@ -122,17 +122,17 @@ private fun changeFromPrepare(
     request: DownLoadRequest
 ) {
     result?.onPrepare?.invoke()
-    request.listener?.onDownLoadPrepare(request.tag ?: request.url)
+    request.listener?.onDownLoadPrepare(request.getKey())
 }
 
-private fun <T : Any> changeFromSuccess(
+private fun changeFromSuccess(
     result: DownLoadBuilder?,
-    status: DownLoadResult.Success<T>,
+    status: DownLoadResult.Success,
     request: DownLoadRequest
 ) {
     result?.onSuccess?.invoke(status.data as String)
     request.listener?.onDownLoadSuccess(
-        key = request.tag ?: request.url,
+        key = request.getKey(),
         path = status.data as String
     )
 }
@@ -143,5 +143,5 @@ private fun changeFromError(
     request: DownLoadRequest
 ) {
     result?.onError?.invoke(status.throwable)
-    request.listener?.onDownLoadError(request.tag ?: request.url, status.throwable)
+    request.listener?.onDownLoadError(request.getKey(), status.throwable)
 }

@@ -2,23 +2,23 @@ package com.allens.moya.result
 
 import com.allens.moya.livedata.DownLoadStatusLiveData
 
-sealed class DownLoadResult<out T : Any> {
+sealed class DownLoadResult {
 
-    object Prepare : DownLoadResult<Nothing>()
-    object Cancel : DownLoadResult<Nothing>()
-    object Pause : DownLoadResult<Nothing>()
-    data class Success<T : Any>(val data: T) : DownLoadResult<T>()
-    data class Error(val throwable: Throwable) : DownLoadResult<Nothing>()
+    object Prepare : DownLoadResult()
+    object Cancel : DownLoadResult()
+    object Pause : DownLoadResult()
+    data class Success(val data: String) : DownLoadResult()
+    data class Error(val throwable: Throwable) : DownLoadResult()
     data class Progress(
         val progress: Int,
         val read: Long,
         val count: Long,
         val done: Boolean
-    ) : DownLoadResult<Nothing>()
+    ) : DownLoadResult()
 
 }
 
 data class DownLoadData<T : Disposable>(
-    var liveData: DownLoadStatusLiveData<String>? = null,
+    var liveData: DownLoadStatusLiveData? = null,
     var disposable: T? = null
 )

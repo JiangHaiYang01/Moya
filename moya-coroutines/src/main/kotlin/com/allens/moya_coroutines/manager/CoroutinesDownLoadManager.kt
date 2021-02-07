@@ -11,7 +11,7 @@ import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import okhttp3.ResponseBody
 
-object DownLoadManager : DownLoadManagerImpl<CoroutinesDownLoadRequest, CoroutinesDisposable>() {
+object CoroutinesDownLoadManager : DownLoadManagerImpl<CoroutinesDownLoadRequest, CoroutinesDisposable>() {
     override fun addInterceptor(): MutableSet<OnDownLoadInterceptor> {
         return mutableSetOf()
     }

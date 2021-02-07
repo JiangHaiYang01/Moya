@@ -1,11 +1,15 @@
 package com.allens.moya.impl
 
 import androidx.annotation.MainThread
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.Observer
 import com.allens.moya.Moya
 import com.allens.moya.interceptor.ParameterInterceptor
 import com.allens.moya.livedata.DownLoadStatusLiveData
 import com.allens.moya.request.BasicDownLoadRequest
 import com.allens.moya.request.DownLoadRequest
+import com.allens.moya.request.getKey
 import com.allens.moya.result.Disposable
 import com.allens.moya.result.DownLoadData
 import com.allens.moya.result.DownLoadResult
@@ -30,6 +34,23 @@ abstract class DownLoadManagerImpl<T : BasicDownLoadRequest, R : Disposable> {
 
     //添加拦截器
     abstract fun addInterceptor(): MutableSet<OnDownLoadInterceptor>
+
+
+    //下载的observer 在传入lifecycle 会自动remove
+    //未传入 则需要手动取消
+    internal var observer =
+        HashMap<String, Pair<DownLoadStatusLiveData, Observer<DownLoadResult>>>()
+
+    //删除未绑定LifeCycle的LiveData
+    fun removeObserver() {
+        MoyaLogTool.i("删除未绑定LifeCycle的LiveData size ${observer.size}")
+        observer.forEach {
+            val pair = observer[it.key] ?: return
+            MoyaLogTool.i("remove observer ")
+            pair.first.removeObserver(pair.second)
+        }
+        observer.clear()
+    }
 
     //开始执行请求
     abstract fun startRequest(
@@ -64,7 +85,7 @@ abstract class DownLoadManagerImpl<T : BasicDownLoadRequest, R : Disposable> {
         cancelOrPause(request, DownLoadResult.Cancel)
     }
 
-    private fun cancelOrPause(request: T, status: DownLoadResult<String>) {
+    private fun cancelOrPause(request: T, status: DownLoadResult) {
         val downLoadData = map[getKey(request)]
         if (downLoadData != null) {
             val liveData = downLoadData.liveData
@@ -77,7 +98,7 @@ abstract class DownLoadManagerImpl<T : BasicDownLoadRequest, R : Disposable> {
     }
 
     @MainThread
-    private fun cancelOrPauseAll(status: DownLoadResult<String>) {
+    private fun cancelOrPauseAll(status: DownLoadResult) {
         map.forEach {
             it.value.disposable?.dispose()
             it.value.liveData?.value = status
@@ -86,9 +107,9 @@ abstract class DownLoadManagerImpl<T : BasicDownLoadRequest, R : Disposable> {
 
 
     //修改状态
-    private fun <R : Any> changeStatus(
-        liveData: DownLoadStatusLiveData<R>,
-        status: DownLoadResult<R>,
+    private fun changeStatus(
+        liveData: DownLoadStatusLiveData,
+        status: DownLoadResult,
         request: T
     ) {
         //必须要用 setValue postValue 可能会将事件丢失
@@ -99,7 +120,7 @@ abstract class DownLoadManagerImpl<T : BasicDownLoadRequest, R : Disposable> {
 
     fun startDownLoad(request: T): DownLoadData<R> {
         MoyaLogTool.i("准备开始校验是否合法")
-        val liveData = DownLoadStatusLiveData<String>()
+        val liveData = DownLoadStatusLiveData()
         val result = DownLoadData<R>()
         if (!check(request) { changeStatus(liveData, DownLoadResult.Error(it), request) }) {
             MoyaLogTool.i("校验不通过")

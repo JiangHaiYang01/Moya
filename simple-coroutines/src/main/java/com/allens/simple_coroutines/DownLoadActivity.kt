@@ -11,9 +11,8 @@ import com.allens.moya.impl.OnDownLoadListener
 import com.allens.moya.request.DownLoadRequest
 import com.allens.moya.tools.MoyaLogTool
 import com.allens.moya.tools.toKB
+import com.allens.moya_coroutines.manager.CoroutinesDownLoadManager
 import com.allens.moya_coroutines.request.*
-import kotlinx.coroutines.cancel
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 
@@ -21,7 +20,6 @@ class DownLoadActivity : BaseActivity(), MyAdapter.OnBtnClickListener, OnDownLoa
     private var data: MutableList<DownLoadRequest> = mutableListOf()
     private lateinit var myAdapter: MyAdapter
 
-//    private val downLoadViewModel by viewModels<DownLoadViewModel>()
 
     companion object {
         const val TAG = "TAG"
@@ -100,7 +98,7 @@ class DownLoadActivity : BaseActivity(), MyAdapter.OnBtnClickListener, OnDownLoa
        val job =  launch {
             val tag = request.tag ?: request.url
             moya.create()
-                .lifecycle(this@DownLoadActivity)
+//                .lifecycle(this@DownLoadActivity)
                 .doDownLoad(request) {
                     onSuccess = {
                         myAdapter.setDownLoadSuccess(tag, it)
@@ -183,5 +181,9 @@ class DownLoadActivity : BaseActivity(), MyAdapter.OnBtnClickListener, OnDownLoa
         )
     }
 
-
+    override fun onDestroy() {
+        super.onDestroy()
+        //如果没有绑定lifecycle 则需要自己去removeObserver
+        CoroutinesDownLoadManager.removeObserver()
+    }
 }

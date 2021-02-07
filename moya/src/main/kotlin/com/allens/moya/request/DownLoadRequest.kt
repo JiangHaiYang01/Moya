@@ -3,6 +3,10 @@ package com.allens.moya.request
 import com.allens.moya.impl.OnDownLoadListener
 
 
+fun DownLoadRequest.getKey(): String {
+    return this.tag ?: this.url
+}
+
 //下载请求配置
 open class DownLoadRequest {
     lateinit var url: String
