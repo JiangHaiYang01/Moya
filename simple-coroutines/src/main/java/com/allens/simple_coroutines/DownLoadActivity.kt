@@ -1,5 +1,7 @@
 package com.allens.simple_coroutines
 
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
@@ -7,8 +9,11 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.allens.moya.impl.OnDownLoadListener
 import com.allens.moya.request.DownLoadRequest
+import com.allens.moya.tools.MoyaLogTool
 import com.allens.moya.tools.toKB
 import com.allens.moya_coroutines.request.*
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 
@@ -92,7 +97,7 @@ class DownLoadActivity : BaseActivity(), MyAdapter.OnBtnClickListener, OnDownLoa
     }
 
     private fun type2(request: DownLoadRequest) {
-        launch {
+       val job =  launch {
             val tag = request.tag ?: request.url
             moya.create()
                 .lifecycle(this@DownLoadActivity)
@@ -124,6 +129,10 @@ class DownLoadActivity : BaseActivity(), MyAdapter.OnBtnClickListener, OnDownLoa
 
                 }
         }
+
+        //在外部终止协程  无法准确记录状态
+//        Handler(Looper.getMainLooper())
+//            .postDelayed(Runnable { job.cancel()},100 )
     }
 
     override fun onItemClickStart(request: DownLoadRequest) {

@@ -21,6 +21,7 @@ object FileTool {
         success: (String) -> Unit,
         progress: (currentProgress: Int, currentSaveLength: Long, fileLength: Long) -> Unit,
         stop: () -> Boolean,
+        afterStopSave :()->Unit
     ) {
         val filePath = getFilePath(request.path!!, request.name!!)
         if (filePath == null) {
@@ -43,7 +44,7 @@ object FileTool {
 
         while (inputStream.read(buffer).also { len = it } != -1) {
             if (stop()) {
-                MoyaLogTool.i("stop save")
+                afterStopSave()
                 break
             }
             mappedBuffer.put(buffer, 0, len)

@@ -1,6 +1,7 @@
 package com.allens.moya.impl
 
 import androidx.annotation.MainThread
+import com.allens.moya.Moya
 import com.allens.moya.interceptor.ParameterInterceptor
 import com.allens.moya.livedata.DownLoadStatusLiveData
 import com.allens.moya.request.BasicDownLoadRequest
@@ -68,8 +69,9 @@ abstract class DownLoadManagerImpl<T : BasicDownLoadRequest, R : Disposable> {
         if (downLoadData != null) {
             val liveData = downLoadData.liveData
             if (liveData != null) {
-                changeStatus(liveData, status, request)
+                //一定要线 cancel  在更新状态 否在在 afterStopSave 获取的状态将不对
                 downLoadData.disposable?.dispose()
+                changeStatus(liveData, status, request)
             }
         }
     }
@@ -77,8 +79,8 @@ abstract class DownLoadManagerImpl<T : BasicDownLoadRequest, R : Disposable> {
     @MainThread
     private fun cancelOrPauseAll(status: DownLoadResult<String>) {
         map.forEach {
-            it.value.liveData?.value = status
             it.value.disposable?.dispose()
+            it.value.liveData?.value = status
         }
     }
 
@@ -144,7 +146,6 @@ abstract class DownLoadManagerImpl<T : BasicDownLoadRequest, R : Disposable> {
                         PrefTools.remove(request)
                         map.remove(getKey(request))
                         changeStatus(liveData, DownLoadResult.Success(path), request)
-
                     },
                     progress = { currentProgress, currentSaveLength, fileLength ->
                         //记录已经下载的长度
@@ -163,6 +164,16 @@ abstract class DownLoadManagerImpl<T : BasicDownLoadRequest, R : Disposable> {
                     stop = {
                         //判断是否停止保存到文件
                         disposable?.isDisposed ?: false
+                    },
+                    afterStopSave = {
+                        //文件已经停止下载 任务被取消
+                        MoyaLogTool.i("stop save")
+                        //判断当前的任务状态 如果正在执行 说明是在外部被取消的 状态改成cancel
+                        val value = map[getKey(request)]?.liveData?.value ?: return@downToFile
+                        MoyaLogTool.i("4当前的状态 ${value::class.java}")
+                        if (value::class.java != DownLoadResult.Cancel::class.java) {
+                            MoyaLogTool.i("Disable is cancel status is not cancel")
+                        }
                     }
                 )
             }
