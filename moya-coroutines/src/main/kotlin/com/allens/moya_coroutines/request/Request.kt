@@ -4,6 +4,7 @@ import com.allens.moya.livedata.observerState
 import com.allens.moya.message.MoyaMessage
 import com.allens.moya.request.*
 import com.allens.moya.result.*
+import com.allens.moya.tools.MoyaLogTool
 import com.allens.moya.tools.UrlTool
 import com.allens.moya_coroutines.manager.CoroutinesDownLoadManager
 import kotlinx.coroutines.CoroutineScope
@@ -178,6 +179,43 @@ inline fun <reified T : Any> Request.Builder.doPutBlock(
     executePut(parameter)
 }
 
+//=============================================================
+// 上传
+//=============================================================
+suspend fun <T : Any> Request.Builder.executeUpLoad(
+    url: String,
+    listener: UpLoadBuilder<T>
+): String? {
+    for ((key, value) in files) {
+        files[key] =
+            ProgressRequestBody(
+                value.getRequestBody(),
+                progressBlock = { bytesWriting, contentLength, progress ->
+                    MoyaLogTool.i("上传进度:$progress $bytesWriting/$contentLength")
+                    manager.handler.post {
+                        listener.onProgress(progress, bytesWriting, contentLength)
+                    }
+                },
+                errorBlock = {
+                    MoyaLogTool.i("上传异常:${it.message}")
+                    manager.handler.post {
+                        listener.onError(it)
+                    }
+                })
+    }
+    return getServiceWithOutLogInterceptor(manager).upLoad(url, heard, map, files).string()
+}
+
+
+inline fun <reified T : Any> Request.Builder.doUpLoad(
+    url: String,
+    crossinline init: UpLoadBuilder<T>.() -> Unit
+): Disposable {
+    val builder = UpLoadBuilder<T>().apply(init)
+    return executeUpLoadDisable(viewModel, owner, manager, builder) {
+        executeUpLoad(url, builder)
+    }
+}
 
 //=============================================================
 // 下载

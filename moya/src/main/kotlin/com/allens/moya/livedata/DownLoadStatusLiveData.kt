@@ -2,7 +2,7 @@ package com.allens.moya.livedata
 
 import androidx.annotation.MainThread
 import androidx.lifecycle.*
-import com.allens.moya.impl.DownLoadManagerImpl
+import com.allens.moya.manager.DownLoadManagerImpl
 import com.allens.moya.request.BasicDownLoadRequest
 import com.allens.moya.request.DownLoadRequest
 import com.allens.moya.request.getKey

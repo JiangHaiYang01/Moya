@@ -4,10 +4,9 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.viewModelScope
-import com.allens.moya.result.Disposable
 import com.allens.moya.manager.HttpManager
-import com.allens.moya.result.HttpBuilder
-import com.allens.moya.result.HttpResult
+import com.allens.moya.result.*
+import com.allens.moya.tools.MoyaLogTool
 import com.allens.moya_coroutines.impl.ApiService
 import kotlinx.coroutines.*
 import okhttp3.ResponseBody
@@ -18,6 +17,10 @@ import retrofit2.Response
 //=============================================================
 internal fun getService(manager: HttpManager): ApiService {
     return manager.getService()
+}
+
+internal fun getServiceWithOutLogInterceptor(manager: HttpManager): ApiService {
+    return manager.getServiceWithOutLogInterceptor()
 }
 
 internal fun Response<ResponseBody>.string(): String? {
@@ -57,14 +60,40 @@ inline fun <reified T : Any> executeDisable(
 ): Disposable {
     val job = executeRequest(viewModel = viewModel, lifecycleOwner = lifecycle) {
         val result = decode<T>(manager) { action() }
+        val apply = HttpBuilder<T>().apply(init)
         withContext(Dispatchers.Main) {
-            val apply = HttpBuilder<T>().apply(init)
             if (result is HttpResult.Success) {
+                MoyaLogTool.i("请求成功")
                 apply.onSuccess(result.data)
             } else if (result is HttpResult.Error) {
+                MoyaLogTool.i("请求失败:${result.throwable.message}")
                 apply.onError(result.throwable)
             }
             apply.onComplete()
+        }
+    }
+    return CoroutinesDisposable(job)
+}
+
+inline fun <reified T : Any> executeUpLoadDisable(
+    viewModel: ViewModel?,
+    lifecycle: LifecycleOwner?,
+    manager: HttpManager,
+    builder: UpLoadBuilder<T>,
+    crossinline action: suspend () -> String?
+): Disposable {
+    val job = executeRequest(viewModel = viewModel, lifecycleOwner = lifecycle) {
+        val result = decode<T>(manager) { action() }
+
+        withContext(Dispatchers.Main) {
+            if (result is HttpResult.Success) {
+                MoyaLogTool.i("上传请求成功")
+                builder.onSuccess(result.data)
+            } else if (result is HttpResult.Error) {
+                MoyaLogTool.i("上传请求失败:${result.throwable.message}")
+                builder.onError(result.throwable)
+            }
+            builder.onComplete()
         }
     }
     return CoroutinesDisposable(job)

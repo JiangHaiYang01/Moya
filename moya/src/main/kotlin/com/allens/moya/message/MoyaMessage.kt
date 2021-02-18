@@ -18,6 +18,7 @@ class MoyaMessage {
         const val DELETE = EXPRESSION + "doDelete" + METHOD
         const val BODY = EXPRESSION + "doBody" + METHOD
         const val PUT = EXPRESSION + "doPut" + METHOD
+        const val doUpLoad = EXPRESSION + "doUpLoad" + METHOD
 
 
     }

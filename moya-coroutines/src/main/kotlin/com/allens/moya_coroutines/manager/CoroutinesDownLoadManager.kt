@@ -1,13 +1,12 @@
 package com.allens.moya_coroutines.manager
 
-import com.allens.moya.impl.DownLoadManagerImpl
+import com.allens.moya.manager.DownLoadManagerImpl
 import com.allens.moya.impl.OnDownLoadInterceptor
-import com.allens.moya.result.Disposable
 import com.allens.moya_coroutines.impl.ApiService
 import com.allens.moya_coroutines.request.CoroutinesDisposable
 import com.allens.moya_coroutines.request.CoroutinesDownLoadRequest
+import com.allens.moya_coroutines.request.getServiceWithOutLogInterceptor
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import okhttp3.ResponseBody
 
@@ -23,7 +22,7 @@ object CoroutinesDownLoadManager : DownLoadManagerImpl<CoroutinesDownLoadRequest
         block: (ResponseBody?) -> Unit
     ): CoroutinesDisposable {
         val job = request.coroutines.launch(Dispatchers.IO) {
-            val response = request.manager.getServiceWithOutLogInterceptor<ApiService>()
+            val response = getServiceWithOutLogInterceptor(request.manager)
                 .downloadFile("bytes=$currentLength-", request.url)
             val responseBody = response.body()
             block(responseBody)

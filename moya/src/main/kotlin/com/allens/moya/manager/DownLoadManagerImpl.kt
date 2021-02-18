@@ -1,15 +1,12 @@
-package com.allens.moya.impl
+package com.allens.moya.manager
 
 import androidx.annotation.MainThread
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
-import com.allens.moya.Moya
+import com.allens.moya.impl.OnDownLoadInterceptor
 import com.allens.moya.interceptor.ParameterInterceptor
 import com.allens.moya.livedata.DownLoadStatusLiveData
 import com.allens.moya.request.BasicDownLoadRequest
 import com.allens.moya.request.DownLoadRequest
-import com.allens.moya.request.getKey
 import com.allens.moya.result.Disposable
 import com.allens.moya.result.DownLoadData
 import com.allens.moya.result.DownLoadResult

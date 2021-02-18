@@ -7,16 +7,15 @@ import okhttp3.RequestBody
 import okio.*
 import java.io.IOException
 
-
 class ProgressRequestBody(
     private val requestBody: RequestBody,
-    val progress: (
+    val progressBlock: ((
         bytesWriting: Long,
         contentLength: Long,
         progress: Int
-    ) -> Unit
-) :
-    RequestBody() {
+    ) -> Unit)? = null,
+     val errorBlock: ((Throwable) -> Unit)? = null
+) : RequestBody() {
     private var bufferedSink: BufferedSink? = null
 
     private var lastProgress: Int = 0
@@ -37,12 +36,15 @@ class ProgressRequestBody(
     }
 
     //关键方法
-    @Throws(IOException::class)
     override fun writeTo(sink: BufferedSink) {
-        if (null == bufferedSink) bufferedSink = sink(sink).buffer()
-        requestBody.writeTo(bufferedSink!!)
-        //必须调用flush，否则最后一部分数据可能不会被写入
-        bufferedSink!!.flush()
+        try {
+            if (null == bufferedSink) bufferedSink = sink(sink).buffer()
+            requestBody.writeTo(bufferedSink!!)
+            //必须调用flush，否则最后一部分数据可能不会被写入
+            bufferedSink?.flush()
+        } catch (t: Throwable) {
+            errorBlock?.let { it(t) }
+        }
     }
 
     private fun sink(sink: Sink): Sink {
@@ -59,7 +61,7 @@ class ProgressRequestBody(
                 val progress = (bytesWriting.toFloat() / contentLength * 100).toInt() // 计算百分比
                 if (lastProgress != progress) {
                     lastProgress = progress
-                    progress(bytesWriting, contentLength, progress)
+                    progressBlock?.let { it(bytesWriting, contentLength, progress) }
                 }
             }
         }

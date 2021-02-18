@@ -5,12 +5,12 @@ import android.os.Bundle
 import android.os.Environment
 import android.util.Log
 import android.widget.LinearLayout
+import android.widget.Toast
 import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelStoreOwner
 import com.allens.moya.Moya
-import com.allens.moya_coroutines.request.doGet
 import com.allens.moya_coroutines.request.doGetBlock
 import com.google.android.material.button.MaterialButton
 import kotlinx.coroutines.CoroutineScope
@@ -65,6 +65,10 @@ abstract class BaseActivity(private var layout: Int = R.layout.activity_main) :
         }
         return p
     }
+
+    fun toast(info: String) {
+        Toast.makeText(this, info, Toast.LENGTH_SHORT).show()
+    }
 }
 
 class MainViewModel : ViewModel(), LifecycleObserver {
@@ -73,9 +77,15 @@ class MainViewModel : ViewModel(), LifecycleObserver {
             .parameter("k", "java")
             .viewModel(this)
             .doGetBlock<String>("wxarticle/chapters/json") {
-                it.doSuccess { log("success") }
-                it.doFailed { log("error") }
-                it.doComplete { log("complete") }
+                it.doSuccess {
+                    log("success")
+                }
+                it.doFailed {
+                    log("error")
+                }
+                it.doComplete {
+                    log("complete")
+                }
             }
     }
 }

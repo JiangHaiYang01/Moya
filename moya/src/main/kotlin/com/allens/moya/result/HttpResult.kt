@@ -3,7 +3,7 @@ package com.allens.moya.result
 import androidx.annotation.MainThread
 
 
-class HttpBuilder<T : Any> {
+open class HttpBuilder<T : Any> {
     var onSuccess: (data: T) -> Unit = {}
     var onError: (Throwable) -> Unit = {}
     var onComplete: () -> Unit = {}
@@ -25,6 +25,7 @@ sealed class HttpResult<out T : Any> {
         return when (this) {
             is Success<*> -> "Success-> $data"
             is Error -> "Error-> ${throwable.message}"
+            else -> "Other -> this is other type"
         }
     }
 

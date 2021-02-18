@@ -67,11 +67,11 @@ interface ApiService {
 
     @Multipart
     @POST
-    suspend fun upFileList(
+    suspend fun upLoad(
         @Url url: String,
         @HeaderMap headers: HashMap<String, String>,
         @QueryMap maps: Map<String, @JvmSuppressWildcards Any>,
-        @PartMap map: Map<String, @JvmSuppressWildcards RequestBody>
+        @PartMap files: Map<String, @JvmSuppressWildcards RequestBody>
     ): Response<ResponseBody>
 
 }

@@ -4,6 +4,7 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModel
 import com.allens.moya.enums.DynamicHeard
 import com.allens.moya.manager.HttpManager
+import com.allens.moya.tools.MoyaLogTool
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.RequestBody
 import okhttp3.RequestBody.Companion.asRequestBody
@@ -73,11 +74,7 @@ class Request {
         fun file(key: String, file: File) = apply {
             val fileBody: RequestBody =
                 file.asRequestBody("multipart/form-data".toMediaTypeOrNull())
-            files[key] = ProgressRequestBody(
-                fileBody,
-                progress = { bytesWriting: Long, contentLength: Long, progress: Int ->
-
-                })
+            files[key] = ProgressRequestBody(fileBody)
         }
     }
 }

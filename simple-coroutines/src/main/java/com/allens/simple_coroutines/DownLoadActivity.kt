@@ -39,7 +39,7 @@ class DownLoadActivity : BaseActivity(), MyAdapter.OnBtnClickListener, OnDownLoa
         for ((index, info) in downloadUrl.withIndex()) {
             data.add(
                 DownLoadRequest.Builder()
-                    .name(".$index")
+                    .name(".$index.jpg")
                     .path(getBasePath())
                     .tag("tag->$index")
                     //可以选择不用 listener 参考下面方式2
@@ -95,9 +95,10 @@ class DownLoadActivity : BaseActivity(), MyAdapter.OnBtnClickListener, OnDownLoa
     }
 
     private fun type2(request: DownLoadRequest) {
-       val job =  launch {
+        val job = launch {
             val tag = request.tag ?: request.url
             moya.create()
+                //绑定LiveData 后台将不会在更新
 //                .lifecycle(this@DownLoadActivity)
                 .doDownLoad(request) {
                     onSuccess = {

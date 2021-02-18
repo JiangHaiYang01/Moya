@@ -5,11 +5,11 @@ interface OnDownLoadProgressListener {
     /**
      * 下载进度
      *
-     * @param key url
+     * @param key       如果设置了tag 就是tag 如何没设置 就是 url
      * @param progress  进度
-     * @param read  读取
-     * @param count 总共长度
-     * @param done  是否完成
+     * @param read      读取
+     * @param count     总共长度
+     * @param done      是否完成
      */
     fun onUpdate(
         key: String,
@@ -24,7 +24,10 @@ interface OnDownLoadProgressListener {
 interface OnDownLoadListener : OnDownLoadProgressListener {
 
 
-    //等待下载
+    /**
+     * 等待下载
+     * @param key String
+     */
     fun onDownLoadPrepare(key: String)
 
     //进度
