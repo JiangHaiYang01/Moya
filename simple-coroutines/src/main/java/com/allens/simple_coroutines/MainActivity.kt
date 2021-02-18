@@ -6,6 +6,9 @@ import android.os.Build
 class MainActivity : BaseActivity() {
 
     override fun doCreate() {
+        addButton("配置Moya") {
+            startActivity(Intent(this, ConfigAct::class.java))
+        }
         addButton("常规使用") {
             startActivity(Intent(this, TestActivity::class.java))
         }

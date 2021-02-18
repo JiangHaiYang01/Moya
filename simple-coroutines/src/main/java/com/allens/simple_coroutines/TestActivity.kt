@@ -19,6 +19,7 @@ class TestActivity : BaseActivity() {
             launch {
                 moya.create()
                     .parameter("k", "java")
+                    //这里泛形可以直接使用对象。
                     .doGet<String>("wxarticle/chapters/json")
                     .doFailed {
                         log("error : ${it.message}")

@@ -47,9 +47,9 @@ class UploadAct : BaseActivity(R.layout.activity_upload), UploadAdapter.OnBtnCli
         moya.create()
             .file("file", File(info.path))
             .lifecycle(this)
+            .baseUrl("https://imgkr.com/")
             .heard("Referer","https://imgkr.com/")
-//            .heard("Connection","close")
-            .doUpLoad<String>("https://imgkr.com/api/v2/files/upload") {
+            .doUpLoad<String>("api/v2/files/upload") {
                 onSuccess = {
                     println("上传成功 $it")
                     myAdapter.uploadSuccess(info.taskId, it)
@@ -64,7 +64,6 @@ class UploadAct : BaseActivity(R.layout.activity_upload), UploadAdapter.OnBtnCli
                     )
                 }
             }
-
     }
 
     override fun onItemClickCancel(info: UpLoadInfo) {

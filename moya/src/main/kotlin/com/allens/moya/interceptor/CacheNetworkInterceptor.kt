@@ -33,7 +33,7 @@ internal class CacheNetworkInterceptor(private val config: HttpConfig) : Interce
             }
         }
         MoyaLogTool.i(
-            "http---->  addNetworkInterceptor " + if (time == 0) {
+            "--> 缓存配置(有网络连接):" + if (time == 0) {
                 "每次都请求实时数据"
             } else {
                 "$time 秒之后请求数据"

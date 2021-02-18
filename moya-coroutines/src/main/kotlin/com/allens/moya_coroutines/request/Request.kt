@@ -183,7 +183,7 @@ inline fun <reified T : Any> Request.Builder.doPutBlock(
 // 上传
 //=============================================================
 suspend fun <T : Any> Request.Builder.executeUpLoad(
-    url: String,
+    parameter: String,
     listener: UpLoadBuilder<T>
 ): String? {
     for ((key, value) in files) {
@@ -203,17 +203,17 @@ suspend fun <T : Any> Request.Builder.executeUpLoad(
                     }
                 })
     }
-    return getServiceWithOutLogInterceptor(manager).upLoad(url, heard, map, files).string()
+    return getServiceWithOutLogInterceptor(manager).upLoad(parameter, heard, map, files).string()
 }
 
 
 inline fun <reified T : Any> Request.Builder.doUpLoad(
-    url: String,
+    parameter: String,
     crossinline init: UpLoadBuilder<T>.() -> Unit
 ): Disposable {
     val builder = UpLoadBuilder<T>().apply(init)
     return executeUpLoadDisable(viewModel, owner, manager, builder) {
-        executeUpLoad(url, builder)
+        executeUpLoad(parameter, builder)
     }
 }
 

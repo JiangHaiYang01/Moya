@@ -7,6 +7,7 @@ import com.allens.moya.interceptor.ParameterInterceptor
 import com.allens.moya.livedata.DownLoadStatusLiveData
 import com.allens.moya.request.BasicDownLoadRequest
 import com.allens.moya.request.DownLoadRequest
+import com.allens.moya.request.getKey
 import com.allens.moya.result.Disposable
 import com.allens.moya.result.DownLoadData
 import com.allens.moya.result.DownLoadResult
@@ -57,11 +58,6 @@ abstract class DownLoadManagerImpl<T : BasicDownLoadRequest, R : Disposable> {
     ): R
 
 
-    //获取Key
-    private fun getKey(request: DownLoadRequest): String {
-        return request.tag ?: request.url
-    }
-
     //暂停下载
     fun pause(request: T) {
         cancelOrPause(request, DownLoadResult.Pause)
@@ -83,7 +79,7 @@ abstract class DownLoadManagerImpl<T : BasicDownLoadRequest, R : Disposable> {
     }
 
     private fun cancelOrPause(request: T, status: DownLoadResult) {
-        val downLoadData = map[getKey(request)]
+        val downLoadData = map[request.getKey()]
         if (downLoadData != null) {
             val liveData = downLoadData.liveData
             if (liveData != null) {
@@ -129,7 +125,7 @@ abstract class DownLoadManagerImpl<T : BasicDownLoadRequest, R : Disposable> {
         MoyaLogTool.i("当前线程---->${Thread.currentThread().name}")
         //准备下载
         changeStatus(liveData, DownLoadResult.Prepare, request)
-        map[getKey(request)] = result
+        map[request.getKey()] = result
         val file = File("${request.path}${File.separator}${request.name}")
         val currentLength = if (!file.exists()) {
             0L
@@ -141,57 +137,28 @@ abstract class DownLoadManagerImpl<T : BasicDownLoadRequest, R : Disposable> {
         try {
             disposable = startRequest(request, currentLength) {
                 if (it == null) {
-                    changeStatus(
-                        liveData,
-                        DownLoadResult.Error(Throwable("response body is null")),
-                        request
-                    )
-                    PrefTools.remove(request)
+                    error(request, liveData, "response body is null")
                     return@startRequest
                 }
-
-                FileTool.downToFile(currentLength, request = request, responseBody = it,
+                FileTool.downToFile(
+                    currentLength = currentLength,
+                    request = request,
+                    responseBody = it,
                     error = {
-                        PrefTools.remove(request)
-                        map.remove(getKey(request))
-                        changeStatus(
-                            liveData,
-                            DownLoadResult.Error(Throwable("create DownLoad file error")),
-                            request
-                        )
+                        error(request, liveData, "create DownLoad file error")
                     },
                     success = { path ->
-                        PrefTools.remove(request)
-                        map.remove(getKey(request))
-                        changeStatus(liveData, DownLoadResult.Success(path), request)
+                        success(request, liveData, path)
                     },
                     progress = { currentProgress, currentSaveLength, fileLength ->
-                        //记录已经下载的长度
-                        PrefTools.putLong(request, currentSaveLength)
-                        changeStatus(
-                            liveData,
-                            DownLoadResult.Progress(
-                                currentProgress,
-                                currentSaveLength,
-                                fileLength,
-                                done = currentSaveLength == fileLength
-                            ),
-                            request
-                        )
+                        progress(request, currentSaveLength, liveData, currentProgress, fileLength)
                     },
                     stop = {
                         //判断是否停止保存到文件
                         disposable?.isDisposed ?: false
                     },
                     afterStopSave = {
-                        //文件已经停止下载 任务被取消
-                        MoyaLogTool.i("stop save")
-                        //判断当前的任务状态 如果正在执行 说明是在外部被取消的 状态改成cancel
-                        val value = map[getKey(request)]?.liveData?.value ?: return@downToFile
-                        MoyaLogTool.i("4当前的状态 ${value::class.java}")
-                        if (value::class.java != DownLoadResult.Cancel::class.java) {
-                            MoyaLogTool.i("Disable is cancel status is not cancel")
-                        }
+                        afterStopSave(request)
                     }
                 )
             }
@@ -199,13 +166,65 @@ abstract class DownLoadManagerImpl<T : BasicDownLoadRequest, R : Disposable> {
             MoyaLogTool.i("download error ${t.message}")
             changeStatus(liveData, DownLoadResult.Error(t), request)
             PrefTools.remove(request)
-        } finally {
-            MoyaLogTool.i("返回 disposable")
-            return result.apply {
-                this.liveData = liveData
-                this.disposable = disposable
-            }
         }
+        MoyaLogTool.i("返回 disposable")
+        return result.apply {
+            this.liveData = liveData
+            this.disposable = disposable
+        }
+    }
+
+    //这里记录了在外部被打断执行以后的状态。
+    private fun afterStopSave(request: T) {
+        MoyaLogTool.i("stop save")
+        //判断当前的任务状态 如果正在执行 说明是在外部被取消的 状态改成cancel
+        val value = map[request.getKey()]?.liveData?.value ?: return
+        MoyaLogTool.i("当前的状态 ${value::class.java}")
+        if (value::class.java != DownLoadResult.Cancel::class.java) {
+            MoyaLogTool.i("Disable is cancel status is not cancel")
+        }
+    }
+
+    //记录已经下载的长度,修改状态。
+    private fun progress(
+        request: T,
+        currentSaveLength: Long,
+        liveData: DownLoadStatusLiveData,
+        currentProgress: Int,
+        fileLength: Long
+    ) {
+        PrefTools.putLong(request, currentSaveLength)
+        changeStatus(
+            liveData,
+            DownLoadResult.Progress(
+                currentProgress,
+                currentSaveLength,
+                fileLength,
+                done = currentSaveLength == fileLength
+            ),
+            request
+        )
+    }
+
+    //文件下载成功
+    private fun success(
+        request: T,
+        liveData: DownLoadStatusLiveData,
+        path: String
+    ) {
+        PrefTools.remove(request)
+        map.remove(request.getKey())
+        changeStatus(liveData, DownLoadResult.Success(path), request)
+    }
+
+    private fun error(request: T, liveData: DownLoadStatusLiveData, errorInfo: String) {
+        PrefTools.remove(request)
+        map.remove(request.getKey())
+        changeStatus(
+            liveData,
+            DownLoadResult.Error(Throwable(errorInfo)),
+            request
+        )
     }
 
 
@@ -217,6 +236,7 @@ abstract class DownLoadManagerImpl<T : BasicDownLoadRequest, R : Disposable> {
         MoyaLogTool.i("校验器size:${interceptors.size}")
         //拦截器
         interceptors
+            //使用倒叙。先执行moya 提供的基础拦截器 ParameterInterceptor
             .reversed()
             .forEach {
                 if (!it.onIntercept(request) { error -> error(error) }) {

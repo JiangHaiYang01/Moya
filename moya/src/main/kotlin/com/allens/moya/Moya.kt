@@ -1,6 +1,7 @@
 package com.allens.moya
 
 import android.content.Context
+import android.os.Debug
 import com.allens.moya.config.HttpConfig
 import com.allens.moya.enums.CacheType
 import com.allens.moya.enums.HttpCacheType
@@ -191,7 +192,13 @@ class Moya {
                     httpConfig.cacheNoNewWorkType = HttpCacheType.NONE
                 }
             }
+        }
 
+        //是否是debug. debug 会显示日志
+        //这里需要注意 如果项目中只有一个 Moya 无所谓
+        //由多个的化 需要对每个moya 都单独配置一下。因为debug 是一个静态属性
+        fun debug(debug: Boolean) = apply {
+            HttpConfig.DEBUG = debug
         }
 
         fun build(context: Context): Moya {

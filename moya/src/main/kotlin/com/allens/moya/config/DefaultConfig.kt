@@ -1,6 +1,6 @@
 package com.allens.moya.config
 
-class DefaultConfig {
+internal class DefaultConfig {
 
     companion object {
         const val DEFAULT_CACHE_PATH = "cacheHttp"

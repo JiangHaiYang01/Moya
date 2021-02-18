@@ -29,7 +29,7 @@ class HttpManager {
     lateinit var retrofit: Retrofit
     lateinit var retrofitDownLoad: Retrofit
     private lateinit var context: Context
-    lateinit var config: HttpConfig
+    private lateinit var config: HttpConfig
 
     fun createManager(config: HttpConfig, context: Context): HttpManager {
         this.config = config

@@ -1,5 +1,6 @@
 package com.allens.moya.config
 
+import android.util.Log
 import com.allens.moya.enums.HttpCacheType
 import com.allens.moya.enums.HttpLevel
 import com.allens.moya.enums.HttpNetWorkType
@@ -13,6 +14,9 @@ import java.util.concurrent.TimeUnit
 
 //RxHttp 配置
 class HttpConfig {
+    companion object{
+        var DEBUG = true
+    }
     //baseUrl
     var baseUrl: String = ""
     //连接超时等
@@ -23,7 +27,7 @@ class HttpConfig {
     var writeTime: Long = DefaultConfig.DEFAULT_TIME_OUT
     var writeTimeTimeUnit = TimeUnit.SECONDS
     //是否重试
-    var retryOnConnectionFailure: Boolean = false
+    var retryOnConnectionFailure: Boolean = true
     //日志的级别
     var level: HttpLevel = HttpLevel.BODY
     //日志的拦截器

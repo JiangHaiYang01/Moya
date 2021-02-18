@@ -24,12 +24,14 @@ abstract class BaseActivity(private var layout: Int = R.layout.activity_main) :
 
     lateinit var moya: Moya
 
+    val BASEURL = "https://www.wanandroid.com"
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(layout)
         linear = findViewById(R.id.linear)
         moya = Moya.Builder()
-            .baseUrl("https://www.wanandroid.com")
+            .baseUrl(BASEURL)
             .build(this)
         doCreate()
     }
