@@ -1,2 +1,3 @@
 rootProject.name = "tea"
 include ':app'
+includeBuild 'versionPlugin'
