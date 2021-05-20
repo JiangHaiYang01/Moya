@@ -15,6 +15,10 @@ object Libs {
     const val material = "com.google.android.material:material:1.3.0"
 
 
+    //cookie
+    const val persistentCookieJar = "com.github.franmontiel:PersistentCookieJar:v1.0.1"
+
+
     object Kotlin {
         private const val version = "1.5.0"
         const val stdlib = "org.jetbrains.kotlin:kotlin-stdlib:$version"
@@ -34,5 +38,34 @@ object Libs {
 
             const val espressoCore = "androidx.test.espresso:espresso-core:3.3.0"
         }
+    }
+
+    object Squareup {
+        const val retrofit2 = "com.squareup.retrofit2:retrofit:2.9.0"
+
+        object OkHttp3 {
+            const val loggingInterceptor = "com.squareup.okhttp3:logging-interceptor:4.8.1"
+        }
+    }
+
+    object Google {
+        const val gson = "com.google.code.gson:gson:2.8.6"
+    }
+
+    object Tencent {
+        const val mmkv = "com.tencent:mmkv-static:1.2.8"
+    }
+
+
+    object Lifecycle {
+        private const val version = "2.3.1"
+        const val livedataKtx = "androidx.lifecycle:lifecycle-livedata-ktx:$version"
+        const val viewModelKtx = "androidx.lifecycle:lifecycle-viewmodel-ktx:$version"
+        const val runtimeKtx = "androidx.lifecycle:lifecycle-runtime-ktx:$version"
+    }
+
+    object Custom{
+        const val http = ":lib-http"
+        const val httpCoroutines = ":lib-http-coroutines"
     }
 }
