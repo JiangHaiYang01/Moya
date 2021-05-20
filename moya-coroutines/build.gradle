@@ -61,6 +61,6 @@ dependencies {
     implementation Libs.Lifecycle.livedataKtx
     implementation Libs.Lifecycle.runtimeKtx
 
-    implementation project(Libs.Custom.http)
+    api project(Libs.Custom.http)
 
 }

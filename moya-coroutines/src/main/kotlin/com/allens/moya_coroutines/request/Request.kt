@@ -20,13 +20,13 @@ import okhttp3.RequestBody.Companion.toRequestBody
 suspend fun Request.Builder.executeGet(parameter: String): String? {
     val baseUrl = manager.retrofit.baseUrl().toString()
     var getUrl: String = baseUrl + parameter
-    if (map.size > 0) {
-        val param: String = UrlTool.prepareParam(map)
+    if (config.map.size > 0) {
+        val param: String = UrlTool.prepareParam(config.map)
         if (param.trim().isNotEmpty()) {
             getUrl += "?$param"
         }
     }
-    return getService(manager).doGet(heard, getUrl).string()
+    return getService(manager).doGet(config.heard, getUrl).string()
 }
 
 suspend inline fun <reified T : Any> Request.Builder.doGet(
@@ -37,7 +37,7 @@ suspend inline fun <reified T : Any> Request.Builder.doGet(
 inline fun <reified T : Any> Request.Builder.doGet(
     parameter: String,
     crossinline init: HttpBuilder<T>.() -> Unit
-): Disposable = executeDisable(viewModel, owner, manager, init) {
+): Disposable = executeDisable(config, manager, init) {
     executeGet(parameter)
 }
 
@@ -49,7 +49,7 @@ inline fun <reified T : Any> Request.Builder.doGet(
 inline fun <reified T : Any> Request.Builder.doGetBlock(
     parameter: String,
     crossinline block: suspend (HttpResult<T>) -> Unit
-): Disposable = executeDisable(viewModel, owner, manager, block) {
+): Disposable = executeDisable(config, manager, block) {
     executeGet(parameter)
 }
 
@@ -57,7 +57,7 @@ inline fun <reified T : Any> Request.Builder.doGetBlock(
 // post 表单提交
 //=============================================================
 suspend fun Request.Builder.executePost(parameter: String): String? =
-    getService(manager).doPost(parameter, heard, map).string()
+    getService(manager).doPost(parameter, config.heard, config.map).string()
 
 suspend inline fun <reified T : Any> Request.Builder.doPost(
     parameter: String,
@@ -67,7 +67,7 @@ suspend inline fun <reified T : Any> Request.Builder.doPost(
 inline fun <reified T : Any> Request.Builder.doPost(
     parameter: String,
     crossinline init: HttpBuilder<T>.() -> Unit
-): Disposable = executeDisable(viewModel, owner, manager, init) {
+): Disposable = executeDisable(config, manager, init) {
     executePost(parameter)
 }
 
@@ -79,7 +79,7 @@ inline fun <reified T : Any> Request.Builder.doPost(
 inline fun <reified T : Any> Request.Builder.doPostBlock(
     parameter: String,
     crossinline block: suspend (HttpResult<T>) -> Unit
-): Disposable = executeDisable(viewModel, owner, manager, block) {
+): Disposable = executeDisable(config, manager, block) {
     executePost(parameter)
 }
 
@@ -88,9 +88,9 @@ inline fun <reified T : Any> Request.Builder.doPostBlock(
 // post json 的方式请求
 //=============================================================
 suspend fun Request.Builder.executeBody(parameter: String): String? {
-    val requestBody = manager.gson.toJson(map)
+    val requestBody = manager.gson.toJson(config.map)
         .toRequestBody("application/json".toMediaTypeOrNull())
-    return getService(manager).doBody(parameter, heard, requestBody).string()
+    return getService(manager).doBody(parameter, config.heard, requestBody).string()
 }
 
 suspend inline fun <reified T : Any> Request.Builder.doBody(
@@ -101,7 +101,7 @@ suspend inline fun <reified T : Any> Request.Builder.doBody(
 inline fun <reified T : Any> Request.Builder.doBody(
     parameter: String,
     crossinline init: HttpBuilder<T>.() -> Unit
-): Disposable = executeDisable(viewModel, owner, manager, init) {
+): Disposable = executeDisable(config, manager, init) {
     executeBody(parameter)
 }
 
@@ -114,7 +114,7 @@ inline fun <reified T : Any> Request.Builder.doBody(
 inline fun <reified T : Any> Request.Builder.doBodyBlock(
     parameter: String,
     crossinline block: suspend (HttpResult<T>) -> Unit
-): Disposable = executeDisable(viewModel, owner, manager, block) {
+): Disposable = executeDisable(config, manager, block) {
     executeBody(parameter)
 }
 
@@ -122,7 +122,7 @@ inline fun <reified T : Any> Request.Builder.doBodyBlock(
 // delete
 //=============================================================
 suspend fun Request.Builder.executeDelete(parameter: String): String? =
-    getService(manager).doDelete(parameter, heard, map).string()
+    getService(manager).doDelete(parameter, config.heard, config.map).string()
 
 suspend inline fun <reified T : Any> Request.Builder.doDelete(
     parameter: String,
@@ -132,7 +132,7 @@ suspend inline fun <reified T : Any> Request.Builder.doDelete(
 inline fun <reified T : Any> Request.Builder.doDelete(
     parameter: String,
     crossinline init: HttpBuilder<T>.() -> Unit
-): Disposable = executeDisable(viewModel, owner, manager, init) {
+): Disposable = executeDisable(config, manager, init) {
     executeDelete(parameter)
 }
 
@@ -141,11 +141,10 @@ inline fun <reified T : Any> Request.Builder.doDelete(
     level = DeprecationLevel.WARNING,
     replaceWith = ReplaceWith(MoyaMessage.DELETE, imports = arrayOf(MoyaMessage.IMPORTS))
 )
-
 inline fun <reified T : Any> Request.Builder.doDeleteBlock(
     parameter: String,
     crossinline block: suspend (HttpResult<T>) -> Unit
-): Disposable = executeDisable(viewModel, owner, manager, block) {
+): Disposable = executeDisable(config, manager, block) {
     executeDelete(parameter)
 }
 
@@ -153,7 +152,7 @@ inline fun <reified T : Any> Request.Builder.doDeleteBlock(
 // put
 //=============================================================
 suspend fun Request.Builder.executePut(parameter: String): String? =
-    getService(manager).doPut(parameter, heard, map).string()
+    getService(manager).doPut(parameter, config.heard, config.map).string()
 
 suspend inline fun <reified T : Any> Request.Builder.doPut(
     parameter: String,
@@ -163,7 +162,7 @@ suspend inline fun <reified T : Any> Request.Builder.doPut(
 inline fun <reified T : Any> Request.Builder.doPut(
     parameter: String,
     crossinline init: HttpBuilder<T>.() -> Unit
-): Disposable = executeDisable(viewModel, owner, manager, init) {
+): Disposable = executeDisable(config, manager, init) {
     executePut(parameter)
 }
 
@@ -175,7 +174,7 @@ inline fun <reified T : Any> Request.Builder.doPut(
 inline fun <reified T : Any> Request.Builder.doPutBlock(
     parameter: String,
     crossinline block: suspend (HttpResult<T>) -> Unit
-): Disposable = executeDisable(viewModel, owner, manager, block) {
+): Disposable = executeDisable(config, manager, block) {
     executePut(parameter)
 }
 
@@ -186,8 +185,8 @@ suspend fun <T : Any> Request.Builder.executeUpLoad(
     parameter: String,
     listener: UpLoadBuilder<T>
 ): String? {
-    for ((key, value) in files) {
-        files[key] =
+    for ((key, value) in config.files) {
+        config.files[key] =
             ProgressRequestBody(
                 value.getRequestBody(),
                 progressBlock = { bytesWriting, contentLength, progress ->
@@ -203,7 +202,12 @@ suspend fun <T : Any> Request.Builder.executeUpLoad(
                     }
                 })
     }
-    return getServiceWithOutLogInterceptor(manager).upLoad(parameter, heard, map, files).string()
+    return getServiceWithOutLogInterceptor(manager).upLoad(
+        parameter,
+        config.heard,
+        config.map,
+        config.files
+    ).string()
 }
 
 
@@ -212,7 +216,7 @@ inline fun <reified T : Any> Request.Builder.doUpLoad(
     crossinline init: UpLoadBuilder<T>.() -> Unit
 ): Disposable {
     val builder = UpLoadBuilder<T>().apply(init)
-    return executeUpLoadDisable(viewModel, owner, manager, builder) {
+    return executeUpLoadDisable(config.viewModel, config.owner, manager, builder) {
         executeUpLoad(parameter, builder)
     }
 }
@@ -230,7 +234,7 @@ suspend fun Request.Builder.doDownLoad(
         withContext(Dispatchers.Main) {
             data.liveData?.observerState(
                 manager = CoroutinesDownLoadManager,
-                owner = owner,
+                owner = config.owner,
                 request = coroutinesDownLoadRequest,
                 init = init
             )

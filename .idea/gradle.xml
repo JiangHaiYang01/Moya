@@ -22,8 +22,8 @@
           <set>
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/app" />
-            <option value="$PROJECT_DIR$/lib-http" />
-            <option value="$PROJECT_DIR$/lib-http-coroutines" />
+            <option value="$PROJECT_DIR$/moya" />
+            <option value="$PROJECT_DIR$/moya-coroutines" />
             <option value="$PROJECT_DIR$/versionPlugin" />
           </set>
         </option>

@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.viewModelScope
 import com.allens.moya.manager.HttpManager
+import com.allens.moya.request.Request
 import com.allens.moya.result.*
 import com.allens.moya.tools.MoyaLogTool
 import com.allens.moya_coroutines.impl.ApiService
@@ -34,14 +35,14 @@ suspend inline fun <reified T : Any> execute(
     decode(manager) { block() }
 }
 
+
 inline fun <reified T : Any> executeDisable(
-    viewModel: ViewModel?,
-    lifecycle: LifecycleOwner?,
+    config: Request.Builder.Config,
     manager: HttpManager,
     crossinline block: suspend (HttpResult<T>) -> Unit,
     crossinline action: suspend () -> String?
 ): Disposable {
-    val job = executeRequest(viewModel = viewModel, lifecycleOwner = lifecycle) {
+    val job = executeRequest(viewModel = config.viewModel, lifecycleOwner = config.owner) {
         val result = decode<T>(manager) { action() }
         withContext(Dispatchers.Main) {
             block(result)
@@ -50,15 +51,13 @@ inline fun <reified T : Any> executeDisable(
     return CoroutinesDisposable(job)
 }
 
-
 inline fun <reified T : Any> executeDisable(
-    viewModel: ViewModel?,
-    lifecycle: LifecycleOwner?,
+    config: Request.Builder.Config,
     manager: HttpManager,
     crossinline init: HttpBuilder<T>.() -> Unit,
     crossinline action: suspend () -> String?
 ): Disposable {
-    val job = executeRequest(viewModel = viewModel, lifecycleOwner = lifecycle) {
+    val job = executeRequest(viewModel = config.viewModel, lifecycleOwner = config.owner) {
         val result = decode<T>(manager) { action() }
         val apply = HttpBuilder<T>().apply(init)
         withContext(Dispatchers.Main) {

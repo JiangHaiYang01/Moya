@@ -14,28 +14,34 @@ import java.util.concurrent.TimeUnit
 
 class Request {
     class Builder constructor(val manager: HttpManager) {
-        val heard = HashMap<String, String>()
-        val map = HashMap<String, Any>()
-        val files = HashMap<String, ProgressRequestBody>()
-        var owner: LifecycleOwner? = null
-        var viewModel: ViewModel? = null
+
+        // 配置信息
+        val config = Config()
+
+        class Config {
+            val heard = HashMap<String, String>()
+            val map = HashMap<String, Any>()
+            val files = HashMap<String, ProgressRequestBody>()
+            var owner: LifecycleOwner? = null
+            var viewModel: ViewModel? = null
+        }
 
         //添加请求头
         fun heard(key: String, value: String) = apply {
-            heard[key] = value
+            config.heard[key] = value
         }
 
         //添加请求参数
         fun parameter(key: String, value: Any) = apply {
-            map[key] = value
+            config.map[key] = value
         }
 
         fun lifecycle(lifecycle: LifecycleOwner?) = apply {
-            this.owner = lifecycle
+            config.owner = lifecycle
         }
 
         fun viewModel(viewModel: ViewModel) = apply {
-            this.viewModel = viewModel
+            config.viewModel = viewModel
         }
 
         //动态切换请求的地址
@@ -74,7 +80,7 @@ class Request {
         fun file(key: String, file: File) = apply {
             val fileBody: RequestBody =
                 file.asRequestBody("multipart/form-data".toMediaTypeOrNull())
-            files[key] = ProgressRequestBody(fileBody)
+            config.files[key] = ProgressRequestBody(fileBody)
         }
     }
 }

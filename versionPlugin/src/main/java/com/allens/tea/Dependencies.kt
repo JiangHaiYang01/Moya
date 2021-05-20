@@ -65,7 +65,7 @@ object Libs {
     }
 
     object Custom{
-        const val http = ":lib-http"
-        const val httpCoroutines = ":lib-http-coroutines"
+        const val http = ":moya"
+        const val httpCoroutines = ":moya-coroutines"
     }
 }

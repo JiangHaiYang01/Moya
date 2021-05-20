@@ -1,5 +1,5 @@
 rootProject.name = "tea"
 include ':app'
 includeBuild 'versionPlugin'
-include ':lib-http'
-include ':lib-http-coroutines'
+include ':moya'
+include ':moya-coroutines'

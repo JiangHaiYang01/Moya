@@ -1,6 +1,5 @@
 package com.allens.moya.config
 
-import android.util.Log
 import com.allens.moya.enums.HttpCacheType
 import com.allens.moya.enums.HttpLevel
 import com.allens.moya.enums.HttpNetWorkType

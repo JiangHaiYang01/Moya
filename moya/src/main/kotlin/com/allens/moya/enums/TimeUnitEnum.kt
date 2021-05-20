@@ -6,7 +6,7 @@ import java.util.concurrent.TimeUnit
 
 class DynamicHeard {
     companion object {
-        val TODO_HEARD = Build.BRAND + "_" + Build.MODEL + "_"
+        private val TODO_HEARD = Build.BRAND + "_" + Build.MODEL + "_"
         val DYNAMIC_URL = TODO_HEARD + "DYNAMIC_URL"
         val DYNAMIC_CONNECT_TIME_OUT = TODO_HEARD + "DYNAMIC_CONNECT_TIME_OUT"
         val DYNAMIC_CONNECT_TIME_OUT_TimeUnit = TODO_HEARD + "DYNAMIC_CONNECT_TIME_OUT_TimeUnit"
