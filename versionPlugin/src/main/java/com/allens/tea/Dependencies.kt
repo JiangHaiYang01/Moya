@@ -29,6 +29,10 @@ object Libs {
         const val coreKtx = "androidx.core:core-ktx:1.5.0"
         const val constraintlayout = "androidx.constraintlayout:constraintlayout:2.0.4"
 
+        object Activity {
+            private const val version = "1.2.3"
+            const val activityKtx = "androidx.activity:activity-ktx:$version"
+        }
 
         object Test {
             object Ext {
@@ -64,7 +68,7 @@ object Libs {
         const val runtimeKtx = "androidx.lifecycle:lifecycle-runtime-ktx:$version"
     }
 
-    object Custom{
+    object Custom {
         const val http = ":moya"
         const val httpCoroutines = ":moya-coroutines"
     }

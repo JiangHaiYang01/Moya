@@ -44,6 +44,7 @@ dependencies {
     implementation Libs.AndroidX.appcompat
     implementation Libs.material
     implementation Libs.AndroidX.constraintlayout
+    implementation Libs.AndroidX.Activity.activityKtx
     implementation Libs.junit
     androidTestImplementation Libs.AndroidX.Test.Ext.junit
     androidTestImplementation Libs.AndroidX.Test.espressoCore
