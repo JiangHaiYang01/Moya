@@ -35,6 +35,10 @@ android {
     kotlinOptions {
         jvmTarget = '1.8'
     }
+
+    buildFeatures {
+        viewBinding = true
+    }
 }
 
 dependencies {
@@ -51,4 +55,5 @@ dependencies {
 
 
     implementation project(Libs.Custom.httpCoroutines)
+    implementation Libs.Github.viewbinding
 }

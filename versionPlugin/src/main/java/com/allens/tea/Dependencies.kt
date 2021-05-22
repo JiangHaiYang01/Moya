@@ -72,4 +72,8 @@ object Libs {
         const val http = ":moya"
         const val httpCoroutines = ":moya-coroutines"
     }
+
+    object Github {
+        const val viewbinding = "com.github.DylanCaiCoding.ViewBindingKTX:viewbinding-ktx:1.2.0"
+    }
 }
