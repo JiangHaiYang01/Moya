@@ -9,6 +9,7 @@ import com.allens.moya.config.DefaultConfig
 import com.allens.moya.config.HttpConfig
 import com.allens.moya.enums.HttpNetWorkType
 import com.allens.moya.interceptor.*
+import com.allens.moya.tools.MoyaLogTool
 import com.allens.moya.tools.PrefTools
 import com.franmontiel.persistentcookiejar.PersistentCookieJar
 import com.franmontiel.persistentcookiejar.cache.SetCookieCache
@@ -31,8 +32,10 @@ class HttpManager {
     private lateinit var context: Context
     private lateinit var config: HttpConfig
 
-    fun createManager(config: HttpConfig, context: Context): HttpManager  = apply{
+    fun createManager(config: HttpConfig, context: Context): HttpManager = apply {
         this.config = config
+        MoyaLogTool.i("httpConfig:$config")
+
         this.context = context.applicationContext
 
         //初始化 MMKV

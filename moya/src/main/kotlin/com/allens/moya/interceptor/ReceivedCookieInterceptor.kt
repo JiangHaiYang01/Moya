@@ -20,7 +20,7 @@ class ReceivedCookiesInterceptorImpl(
         //不是拦截全部
         if (!interceptor.isInterceptorAllRequest()) {
             val url = response.request.url.toUrl().toString()
-            if (interceptor.isInterceptorRequest(url)) {
+            if (interceptor.interceptorRequestWithUrl(url)) {
                 interceptor(response)
             }
             return response

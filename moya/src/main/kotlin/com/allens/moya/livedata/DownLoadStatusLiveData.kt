@@ -82,7 +82,7 @@ private fun changeFromPause(
     result: DownLoadBuilder?,
     request: DownLoadRequest
 ) {
-    result?.onPause?.invoke()
+    result?.onPause?.invoke(request.getKey())
     request.listener?.onDownLoadPause(request.getKey())
 }
 
@@ -90,7 +90,7 @@ private fun changeFromCancel(
     result: DownLoadBuilder?,
     request: DownLoadRequest
 ) {
-    result?.onCancel?.invoke()
+    result?.onCancel?.invoke(request.getKey())
     request.listener?.onDownLoadCancel(request.getKey())
 }
 
@@ -99,9 +99,10 @@ private fun changeFromProgress(
     status: DownLoadResult.Progress,
     request: DownLoadRequest
 ) {
-    result?.onProgress?.invoke(status.progress)
+    result?.onProgress?.invoke(request.getKey(), status.progress)
     request.listener?.onDownLoadProgress(request.getKey(), status.progress)
     result?.onUpdate?.invoke(
+        request.getKey(),
         status.progress,
         status.read,
         status.count,
@@ -121,7 +122,7 @@ private fun changeFromPrepare(
     result: DownLoadBuilder?,
     request: DownLoadRequest
 ) {
-    result?.onPrepare?.invoke()
+    result?.onPrepare?.invoke(request.getKey())
     request.listener?.onDownLoadPrepare(request.getKey())
 }
 
@@ -130,10 +131,10 @@ private fun changeFromSuccess(
     status: DownLoadResult.Success,
     request: DownLoadRequest
 ) {
-    result?.onSuccess?.invoke(status.data as String)
+    result?.onSuccess?.invoke(request.getKey(), status.data)
     request.listener?.onDownLoadSuccess(
         key = request.getKey(),
-        path = status.data as String
+        path = status.data
     )
 }
 
@@ -142,6 +143,6 @@ private fun changeFromError(
     status: DownLoadResult.Error,
     request: DownLoadRequest
 ) {
-    result?.onError?.invoke(status.throwable)
+    result?.onError?.invoke(request.getKey(), status.throwable)
     request.listener?.onDownLoadError(request.getKey(), status.throwable)
 }

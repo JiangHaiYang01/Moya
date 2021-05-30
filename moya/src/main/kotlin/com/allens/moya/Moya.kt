@@ -1,8 +1,9 @@
 package com.allens.moya
 
 import android.content.Context
-import android.os.Debug
 import com.allens.moya.config.HttpConfig
+import com.allens.moya.dslMarker.CacheTagMarker
+import com.allens.moya.dslMarker.TimeTagMarker
 import com.allens.moya.enums.CacheType
 import com.allens.moya.enums.HttpCacheType
 import com.allens.moya.enums.HttpLevel
@@ -11,12 +12,16 @@ import com.allens.moya.impl.OnCookieInterceptor
 import com.allens.moya.impl.OnLogInterceptor
 import com.allens.moya.manager.HttpManager
 import com.allens.moya.request.Request
+import com.allens.moya.tools.MoyaLogTool
 import retrofit2.CallAdapter
 import retrofit2.Converter
 import java.util.concurrent.TimeUnit
 
+/***
+ * moya 建造者 构建一个moya 对象
+ */
 
-class                                                                                                                                                                                                                                                           Moya {
+class Moya {
 
     private lateinit var manager: HttpManager
 
@@ -25,14 +30,17 @@ class                                                                           
         return Request.Builder(manager)
     }
 
+    @TimeTagMarker
+    @CacheTagMarker
     class Builder {
 
 
-        private val httpConfig = HttpConfig()
+        internal val httpConfig = HttpConfig()
 
         /***
          * 配置通用的 超时时间
-         * [time] 单位秒
+         * [time] 时间
+         * [timeUnit] 默认单位是 秒
          */
         fun writeTimeout(time: Long, timeUnit: TimeUnit = TimeUnit.SECONDS) = apply {
             httpConfig.writeTime = time
@@ -41,12 +49,12 @@ class                                                                           
 
         /***
          * 配置通用的 超时时间
-         * [time] 单位秒
+         * [time] 时间
+         * [timeUnit] 默认单位是 秒
          */
         fun readTimeout(time: Long, timeUnit: TimeUnit = TimeUnit.SECONDS) = apply {
             httpConfig.readTime = time
             httpConfig.readTimeTimeUnit = timeUnit
-
         }
 
         /***
@@ -54,38 +62,44 @@ class                                                                           
          * [time] 单位秒
          */
         fun connectTimeout(time: Long, timeUnit: TimeUnit = TimeUnit.SECONDS) = apply {
+            MoyaLogTool.i("set connect Time time:$time, TimeUnit:$timeUnit")
             httpConfig.connectTime = time
             httpConfig.connectTimeTimeUnit = timeUnit
-
         }
 
-        //是否重试
+        /**
+         * 是否重试
+         * [retryOnConnectionFailure] true 启动重试
+         */
         fun retryOnConnectionFailure(retryOnConnectionFailure: Boolean) = apply {
             httpConfig.retryOnConnectionFailure = retryOnConnectionFailure
-
         }
 
-
-        //日志级别
-        fun level(level: HttpLevel) = apply {
+        /**
+         * 显示日志级别
+         * [level] @see [HttpLevel] 显示级别的类型
+         */
+        fun logLevel(level: HttpLevel) = apply {
             httpConfig.level = level
-
         }
 
 
-        //添加日志组件，会在[OnLogInterceptorListener] 接口返回框架日志信息
+        /**
+         * 添加日志组件
+         *
+         * [logListener] 接口返回框架日志信息
+         */
         fun logInterceptor(logListener: OnLogInterceptor) = apply {
             httpConfig.logSet.add(logListener)
-
         }
 
 
         /***
          * 添加自定义的[Converter.Factory]
+         * [factory]
          */
         fun converterFactory(factory: Converter.Factory) = apply {
             httpConfig.converterFactorySet.add(factory)
-
         }
 
         /***
@@ -93,19 +107,23 @@ class                                                                           
          */
         fun callAdapterFactory(factory: CallAdapter.Factory) = apply {
             httpConfig.callAdapterFactorySet.add(factory)
-
         }
 
 
         /***
          * 为所有请求都添加heard
+         *
+         * [key] 键
+         * [value] 值
          */
         fun head(key: String, value: String) = apply {
             httpConfig.heardMap[key] = value
-
         }
 
-        //添加 cookie 拦截
+        /**
+         * 添加 cookie 拦截
+         * [onCookieInterceptor]
+         */
         fun cookieInterceptor(
             onCookieInterceptor: OnCookieInterceptor
         ) = apply {
@@ -118,7 +136,6 @@ class                                                                           
          */
         fun baseUrl(url: String) = apply {
             httpConfig.baseUrl = url
-
         }
 
 
@@ -134,7 +151,6 @@ class                                                                           
          */
         fun cacheNetWorkTimeOut(time: Int) = apply {
             httpConfig.cacheNetworkTimeOut = time
-
         }
 
         /***
@@ -145,7 +161,6 @@ class                                                                           
          */
         fun cacheNoNetWorkTimeOut(time: Int) = apply {
             httpConfig.cacheNoNetworkTimeOut = time
-
         }
 
         /***
@@ -154,7 +169,6 @@ class                                                                           
          */
         fun cacheSize(size: Int) = apply {
             httpConfig.cacheSize = size
-
         }
 
         /**
@@ -163,7 +177,6 @@ class                                                                           
          */
         fun cachePath(path: String) = apply {
             httpConfig.cachePath = path
-
         }
 
         /***
@@ -194,12 +207,13 @@ class                                                                           
             }
         }
 
-        //是否是debug. debug 会显示日志
-        //这里需要注意 如果项目中只有一个 Moya 无所谓
-        //由多个的化 需要对每个moya 都单独配置一下。因为debug 是一个静态属性
-        fun debug(debug: Boolean) = apply {
-            HttpConfig.DEBUG = debug
-        }
+//        /***
+//         * 显示日志
+//         * [debug] true  会显示日志 在 logcat 上
+//         */
+//        fun debug(debug: Boolean) = apply {
+//            HttpConfig.DEBUG = debug
+//        }
 
         fun build(context: Context): Moya {
             return Moya().apply {
