@@ -69,9 +69,9 @@ fun <T : BasicDownLoadRequest, R : Disposable> DownLoadStatusLiveData.observerSt
             })
         }
         else -> {
-            //如果没有lifecycle 就需要自己在合适的实际 remove observer
-            //好处就是可以在后台也刷新。不过没意义。因为一般的刷新进度都是给用户看的。
-            //在后台了用户就看不到了 需要用户自行去remove
+            // 如果没有lifecycle 就需要自己在合适的实际 remove observer
+            // 好处就是可以在后台也刷新。不过没意义。因为一般的刷新进度都是给用户看的。
+            // 在后台了用户就看不到了 需要用户自行去remove
             observeForever(observer)
             manager.observer[request.getKey()] = Pair(this, observer)
         }

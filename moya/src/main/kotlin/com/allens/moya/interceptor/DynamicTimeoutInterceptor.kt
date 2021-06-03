@@ -6,7 +6,7 @@ import okhttp3.Interceptor
 import okhttp3.Response
 
 
-//动态设置接口请求超时时间
+// 动态设置接口请求超时时间
 object DynamicTimeoutInterceptor : Interceptor {
     override fun intercept(chain: Interceptor.Chain): Response {
         val request = chain.request()

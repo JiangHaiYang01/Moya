@@ -9,6 +9,7 @@ import androidx.activity.viewModels
 import androidx.core.view.setPadding
 import androidx.lifecycle.viewModelScope
 import com.allens.moya.*
+import com.allens.moya.enums.CacheType
 import com.allens.moya.request.DownLoadRequest
 import com.allens.moya_coroutines.request.*
 import com.allens.tea.databinding.ActivityMainBinding
@@ -28,11 +29,27 @@ class MainActivity : AppCompatActivity() {
     }
 
     private val moya by lazy {
-        Moya.Builder()
-            // base url
-            .baseUrl("https://www.wanandroid.com")
-            .head("hello", "world")
-            .build(this)
+//        Moya.Builder()
+//            // base url
+//            .baseUrl("https://www.wanandroid.com")
+//            .head("hello", "world")
+//            .build(this)
+
+        moya(this){
+            url = "https://www.wanandroid.com"
+            time = {
+                connect = 1L
+                write = 2L
+                read = 3L
+            }
+            cache = {
+                type = CacheType.NONE
+                path = ""
+                size = 10
+                noNetworkTimeOut = 10
+                networkTimeOut = 10
+            }
+        }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {

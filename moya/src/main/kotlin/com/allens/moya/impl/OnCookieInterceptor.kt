@@ -1,7 +1,10 @@
 package com.allens.moya.impl
 
 interface OnCookieInterceptor {
-    //是否拦截所有方法的cookie
+
+    /***
+     * 是否拦截所有方法的cookie
+     */
     fun isInterceptorAllRequest(): Boolean {
         return false
     }
@@ -12,6 +15,8 @@ interface OnCookieInterceptor {
      */
     fun interceptorRequestWithUrl(url: String): Boolean
 
-    //拦截返回
+    /**
+     * 拦截返回 cookie
+     */
     fun onCookies(cookie: HashSet<String>)
 }

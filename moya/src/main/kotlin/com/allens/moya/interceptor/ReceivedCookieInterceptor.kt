@@ -4,7 +4,7 @@ import com.allens.moya.impl.OnCookieInterceptor
 import okhttp3.Interceptor
 import okhttp3.Response
 
-//cookie 拦截器
+// cookie 拦截器
 object ReceivedCookieInterceptor {
     fun register(interceptor: OnCookieInterceptor): Interceptor {
         return ReceivedCookiesInterceptorImpl(interceptor)
@@ -17,7 +17,7 @@ class ReceivedCookiesInterceptorImpl(
 ) : Interceptor {
     override fun intercept(chain: Interceptor.Chain): Response {
         val response = chain.proceed(chain.request())
-        //不是拦截全部
+        // 不是拦截全部
         if (!interceptor.isInterceptorAllRequest()) {
             val url = response.request.url.toUrl().toString()
             if (interceptor.interceptorRequestWithUrl(url)) {
@@ -26,7 +26,7 @@ class ReceivedCookiesInterceptorImpl(
             return response
         }
 
-        //这里获取请求返回的cookie
+        // 这里获取请求返回的cookie
         interceptor(response)
 
         return response

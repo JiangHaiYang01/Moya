@@ -20,7 +20,7 @@ sealed class HttpResult<out T : Any> {
 
     private var isComplete = false
 
-    //toString 返回结果String
+    // toString 返回结果String
     override fun toString(): String {
         return when (this) {
             is Success<*> -> "Success-> $data"
@@ -29,7 +29,7 @@ sealed class HttpResult<out T : Any> {
     }
 
 
-    //返回结果
+    // 返回结果
     fun get(): T? {
         if (this is Success) {
             return data
@@ -37,7 +37,7 @@ sealed class HttpResult<out T : Any> {
         return null
     }
 
-    //请求成功
+    // 请求成功
     @MainThread
     fun doSuccess(block: (T) -> Unit) = apply {
         if (this is Success) {
@@ -47,7 +47,7 @@ sealed class HttpResult<out T : Any> {
         }
     }
 
-    //请求失败
+    // 请求失败
     @MainThread
     fun doFailed(block: (Throwable) -> Unit) = apply {
         if (this is Error) {
@@ -57,7 +57,7 @@ sealed class HttpResult<out T : Any> {
         }
     }
 
-    //请求完成
+    // 请求完成
     @MainThread
     fun doComplete(block: () -> Unit) = apply {
         if (isComplete) {

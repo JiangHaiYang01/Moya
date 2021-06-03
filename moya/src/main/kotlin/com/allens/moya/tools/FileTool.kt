@@ -40,7 +40,7 @@ object FileTool {
         val buffer = ByteArray(1024 * 4)
         var len :Int
         var lastProgress = 0
-        var currentSaveLength = currentLength //当前的长度
+        var currentSaveLength = currentLength // 当前的长度
 
         while (inputStream.read(buffer).also { len = it } != -1) {
             if (stop()) {
@@ -71,7 +71,7 @@ object FileTool {
         if (currentLength == 0L) responseBody.contentLength() else currentLength + responseBody.contentLength()
 
 
-    //获取下载地址
+    // 获取下载地址
     private fun getFilePath(savePath: String, saveName: String): String? {
         if (!createFile(savePath)) {
             return null
@@ -81,7 +81,7 @@ object FileTool {
     }
 
 
-    //创建文件夹
+    // 创建文件夹
     private fun createFile(downLoadPath: String): Boolean {
         val file = File(downLoadPath)
         if (!file.exists()) {
@@ -91,49 +91,36 @@ object FileTool {
     }
 
 
-    //格式化小数
+    // 格式化小数
     fun bytes2kb(bytes: Long): String {
-        val format = DecimalFormat("###.0")
-        return when {
-            bytes / GB >= 1 -> {
-                format.format(bytes / GB) + "GB";
-            }
-            bytes / MB >= 1 -> {
-                format.format(bytes / MB) + "MB";
-            }
-            bytes / KB >= 1 -> {
-                format.format(bytes / KB) + "KB";
-            }
-            else -> {
-                "${bytes}B";
-            }
-        }
+        return bytes.toKB()
     }
 }
 
-//定义GB的计算常量
+// 定义GB的计算常量
 private const val GB = 1024 * 1024 * 1024
 
-//定义MB的计算常量
+// 定义MB的计算常量
 private const val MB = 1024 * 1024
 
-//定义KB的计算常量
+// 定义KB的计算常量
 private const val KB = 1024
 
+// 拓展函数格式化
 fun Long.toKB(): String {
     val format = DecimalFormat("###.0")
     return when {
         this / GB >= 1 -> {
-            format.format(this / GB) + "GB";
+            format.format(this / GB) + "GB"
         }
         this / MB >= 1 -> {
-            format.format(this / MB) + "MB";
+            format.format(this / MB) + "MB"
         }
         this / KB >= 1 -> {
-            format.format(this / KB) + "KB";
+            format.format(this / KB) + "KB"
         }
         else -> {
-            "${this}B";
+            "${this}B"
         }
     }
 }

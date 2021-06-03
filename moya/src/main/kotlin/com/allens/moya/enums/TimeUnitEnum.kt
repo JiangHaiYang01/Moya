@@ -41,8 +41,6 @@ class DynamicHeard {
             }
         }
     }
-
-
 }
 
 enum class TimeUnitEnum(val info: String, val timeUnit: TimeUnit) {
@@ -53,5 +51,4 @@ enum class TimeUnitEnum(val info: String, val timeUnit: TimeUnit) {
     MINUTES("MINUTES", TimeUnit.MINUTES),
     HOURS("HOURS", TimeUnit.HOURS),
     DAYS("DAYS", TimeUnit.DAYS),
-
 }

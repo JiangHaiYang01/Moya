@@ -1,13 +1,10 @@
 package com.allens.moya
 
 import android.content.Context
-import android.util.Log
-import com.allens.moya.config.MoyaCache
-import com.allens.moya.config.MoyaTime
+import com.allens.moya.config.NetCacheCache
+import com.allens.moya.config.NetWorkTimeOut
 import com.allens.moya.delegate.LambdaDelegate
-import com.allens.moya.enums.HttpLevel
-import com.allens.moya.impl.OnLogInterceptor
-import java.util.logging.Logger
+import com.allens.moya.enums.LoggerLevel
 
 /***
  * 此类是 moya 的拓展属性，方便使用dsl 实现接口配置
@@ -28,47 +25,39 @@ var Moya.Builder.url: String
         baseUrl(value)
     }
 
-
-var Moya.Builder.write: Long
-    get() = httpConfig.writeTime
-    set(value) {
-        writeTimeout(value)
-    }
-
-
-var Moya.Builder.read: Long
-    get() = httpConfig.readTime
-    set(value) {
-        readTimeout(value)
-    }
-
-var Moya.Builder.connect: Long
-    get() = httpConfig.connectTime
-    set(value) {
-        connectTimeout(value)
-    }
-
-
-var Moya.Builder.time: MoyaTime.() -> Unit
-    get() = { MoyaTime(connect, read, write) }
-    set(value) {
-        Log.i("TAG","value:$value")
-        Log.i("TAG","connect:$connect")
-//        value.invoke(this)
-//        readTimeout(value)
-
-    }
-
 var Moya.Builder.retry: Boolean
     get() = httpConfig.retryOnConnectionFailure
     set(value) {
         retryOnConnectionFailure(value)
     }
 
-var Moya.Builder.level: HttpLevel
+var Moya.Builder.level: LoggerLevel
     get() = httpConfig.level
     set(value) {
         logLevel(value)
     }
+
+// 配置网络超时时间等
+var Moya.Builder.time: NetWorkTimeOut.() -> Unit by LambdaDelegate<NetWorkTimeOut, Moya.Builder>(
+    NetWorkTimeOut()
+) { netWorkTime, builder ->
+    builder.connectTimeout(time = netWorkTime.connect)
+    builder.readTimeout(time = netWorkTime.read)
+    builder.writeTimeout(time = netWorkTime.write)
+}
+
+// 配置缓存等
+var Moya.Builder.cache: NetCacheCache.() -> Unit by LambdaDelegate<NetCacheCache, Moya.Builder>(
+    NetCacheCache()
+) { cache, builder ->
+    builder.cacheNetWorkTimeOut(cache.networkTimeOut)
+    builder.cacheNoNetWorkTimeOut(cache.noNetworkTimeOut)
+    builder.cacheSize(cache.size)
+    builder.cachePath(cache.path)
+    builder.cacheType(cache.type)
+}
+
+
+
 
 

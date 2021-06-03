@@ -35,12 +35,12 @@ class ProgressRequestBody(
         return requestBody.contentLength()
     }
 
-    //关键方法
+    // 关键方法
     override fun writeTo(sink: BufferedSink) {
         try {
             if (null == bufferedSink) bufferedSink = sink(sink).buffer()
             requestBody.writeTo(bufferedSink!!)
-            //必须调用flush，否则最后一部分数据可能不会被写入
+            // 必须调用flush，否则最后一部分数据可能不会被写入
             bufferedSink?.flush()
         } catch (t: Throwable) {
             errorBlock?.let { it(t) }
@@ -57,7 +57,7 @@ class ProgressRequestBody(
                 super.write(source, byteCount)
                 if (0L == contentLength) contentLength = contentLength()
                 bytesWriting += byteCount
-                //调用接口，把上传文件的进度传过去
+                // 调用接口，把上传文件的进度传过去
                 val progress = (bytesWriting.toFloat() / contentLength * 100).toInt() // 计算百分比
                 if (lastProgress != progress) {
                     lastProgress = progress

@@ -7,7 +7,7 @@ fun DownLoadRequest.getKey(): String {
     return this.tag ?: this.url
 }
 
-//下载请求配置
+// 下载请求配置
 open class DownLoadRequest {
     lateinit var url: String
     var path: String? = null

@@ -6,7 +6,7 @@ import android.net.NetworkCapabilities
 import android.os.Build
 import androidx.annotation.RequiresApi
 import com.allens.moya.config.HttpConfig
-import com.allens.moya.enums.HttpCacheType
+import com.allens.moya.enums.NoNetWorkCacheType
 import com.allens.moya.tools.MoyaLogTool
 import okhttp3.CacheControl
 import okhttp3.Interceptor
@@ -24,12 +24,12 @@ internal class CacheInterceptor(private val context: Context, private val httpCo
                 .newBuilder()
                 .build()
         } else {
-            //无网络,检查*天内的缓存,即使是过期的缓存
+            // 无网络,检查*天内的缓存,即使是过期的缓存
             val time = when (httpConfig.cacheNoNewWorkType) {
-                HttpCacheType.NO_TIMEOUT -> {
+                NoNetWorkCacheType.NO_TIMEOUT -> {
                     Integer.MAX_VALUE
                 }
-                HttpCacheType.HAS_TIMEOUT -> {
+                NoNetWorkCacheType.HAS_TIMEOUT -> {
                     httpConfig.cacheNoNetworkTimeOut
                 }
                 else -> {
@@ -58,7 +58,7 @@ internal class CacheInterceptor(private val context: Context, private val httpCo
 }
 
 
-//判断是否连接
+// 判断是否连接
 private fun isNetworkAvailable(context: Context): Boolean {
     return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
         isNetWorkAvailableM(context)
@@ -68,19 +68,19 @@ private fun isNetworkAvailable(context: Context): Boolean {
 }
 
 
-//获取 ConnectivityManager
+// 获取 ConnectivityManager
 private fun getManager(context: Context): ConnectivityManager {
     return context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
 }
 
-//23以下 判断是否连接
+// 23以下 判断是否连接
 private fun isNetWorkAvailableL(context: Context): Boolean {
     val manger = getManager(context)
     val info = manger.activeNetworkInfo
     return info != null && info.isConnected
 }
 
-//23以上 判断是否连接
+// 23以上 判断是否连接
 @RequiresApi(Build.VERSION_CODES.M)
 private fun isNetWorkAvailableM(context: Context): Boolean {
     val connectivityManager = getManager(context)
@@ -88,11 +88,11 @@ private fun isNetWorkAvailableM(context: Context): Boolean {
     val actNw =
         connectivityManager.getNetworkCapabilities(networkCapabilities) ?: return false
     return when {
-        //wifi网络
+        // wifi网络
         actNw.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) -> true
-        //蜂窝网络
+        // 蜂窝网络
         actNw.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) -> true
-        //以太网
+        // 以太网
         actNw.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET) -> true
         else -> false
     }

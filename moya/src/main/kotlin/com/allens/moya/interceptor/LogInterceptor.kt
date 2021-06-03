@@ -2,7 +2,7 @@ package com.allens.moya.interceptor
 
 import android.os.Handler
 import com.allens.moya.config.HttpConfig
-import com.allens.moya.enums.HttpLevel
+import com.allens.moya.enums.LoggerLevel
 import com.allens.moya.tools.MoyaLogTool
 import okhttp3.logging.HttpLoggingInterceptor
 
@@ -27,7 +27,7 @@ object LogInterceptor {
                 }
             }
         })
-        interceptor.level = HttpLevel.conversion(config.level)
+        interceptor.level = LoggerLevel.conversion(config.level)
         return interceptor
     }
 }

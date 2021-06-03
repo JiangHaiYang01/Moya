@@ -2,15 +2,17 @@ package com.allens.moya.enums
 
 import okhttp3.logging.HttpLoggingInterceptor
 
-
-enum class HttpLevel {
+/**
+ * 日志等级
+ */
+enum class LoggerLevel {
     NONE,
     BASIC,
     HEADERS,
     BODY;
 
     companion object {
-        fun conversion(level: HttpLevel): HttpLoggingInterceptor.Level {
+        fun conversion(level: LoggerLevel): HttpLoggingInterceptor.Level {
             return when (level) {
                 BODY -> HttpLoggingInterceptor.Level.BODY
                 NONE -> HttpLoggingInterceptor.Level.NONE

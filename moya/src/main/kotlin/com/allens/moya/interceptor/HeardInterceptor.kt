@@ -4,7 +4,9 @@ import com.allens.moya.tools.MoyaLogTool
 import okhttp3.Interceptor
 import okhttp3.Request
 
-//请求头
+/**
+ * 为所有请求添加请求头
+ */
 object HeardInterceptor {
     fun register(map: Map<String, String>): Interceptor {
         return Interceptor { chain: Interceptor.Chain ->

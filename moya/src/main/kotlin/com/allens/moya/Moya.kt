@@ -5,9 +5,9 @@ import com.allens.moya.config.HttpConfig
 import com.allens.moya.dslMarker.CacheTagMarker
 import com.allens.moya.dslMarker.TimeTagMarker
 import com.allens.moya.enums.CacheType
-import com.allens.moya.enums.HttpCacheType
-import com.allens.moya.enums.HttpLevel
-import com.allens.moya.enums.HttpNetWorkType
+import com.allens.moya.enums.NetWorkCacheType
+import com.allens.moya.enums.NoNetWorkCacheType
+import com.allens.moya.enums.LoggerLevel
 import com.allens.moya.impl.OnCookieInterceptor
 import com.allens.moya.impl.OnLogInterceptor
 import com.allens.moya.manager.HttpManager
@@ -77,9 +77,9 @@ class Moya {
 
         /**
          * 显示日志级别
-         * [level] @see [HttpLevel] 显示级别的类型
+         * [level] @see [LoggerLevel] 显示级别的类型
          */
-        fun logLevel(level: HttpLevel) = apply {
+        fun logLevel(level: LoggerLevel) = apply {
             httpConfig.level = level
         }
 
@@ -143,8 +143,8 @@ class Moya {
          *
          * 有网时:[time]秒之后请求数据  默认20秒
          * 缓存策略 选择
-         * [CacheType.HAS_NETWORK_CACHE_TIME_AND_NO_NETWORK_NO_TIME]
-         * [CacheType.HAS_NETWORK_CACHE_TIME_AND_NO_NETWORK_HAS_TIME]
+         * [NetWorkCacheType.HAS_NETWORK_CACHE_TIME_AND_NO_NETWORK_NO_TIME]
+         * [NetWorkCacheType.HAS_NETWORK_CACHE_TIME_AND_NO_NETWORK_HAS_TIME]
          * 时候生效
          *
          * 实际上只是在请求的时候带上请求头 [max-age=time] max-age:最大缓存时间
@@ -185,24 +185,24 @@ class Moya {
         fun cacheType(type: CacheType) = apply {
             when (type) {
                 CacheType.HAS_NETWORK_NOCACHE_AND_NO_NETWORK_NO_TIME -> {
-                    httpConfig.cacheNetWorkType = HttpNetWorkType.NOCACHE
-                    httpConfig.cacheNoNewWorkType = HttpCacheType.NO_TIMEOUT
+                    httpConfig.cacheNetWorkType = NetWorkCacheType.NOCACHE
+                    httpConfig.cacheNoNewWorkType = NoNetWorkCacheType.NO_TIMEOUT
                 }
                 CacheType.HAS_NETWORK_CACHE_TIME_AND_NO_NETWORK_NO_TIME -> {
-                    httpConfig.cacheNetWorkType = HttpNetWorkType.CACHE_TIME
-                    httpConfig.cacheNoNewWorkType = HttpCacheType.NO_TIMEOUT
+                    httpConfig.cacheNetWorkType = NetWorkCacheType.CACHE_TIME
+                    httpConfig.cacheNoNewWorkType = NoNetWorkCacheType.NO_TIMEOUT
                 }
                 CacheType.HAS_NETWORK_NOCACHE_AND_NO_NETWORK_HAS_TIME -> {
-                    httpConfig.cacheNetWorkType = HttpNetWorkType.NOCACHE
-                    httpConfig.cacheNoNewWorkType = HttpCacheType.HAS_TIMEOUT
+                    httpConfig.cacheNetWorkType = NetWorkCacheType.NOCACHE
+                    httpConfig.cacheNoNewWorkType = NoNetWorkCacheType.HAS_TIMEOUT
                 }
                 CacheType.HAS_NETWORK_CACHE_TIME_AND_NO_NETWORK_HAS_TIME -> {
-                    httpConfig.cacheNetWorkType = HttpNetWorkType.CACHE_TIME
-                    httpConfig.cacheNoNewWorkType = HttpCacheType.HAS_TIMEOUT
+                    httpConfig.cacheNetWorkType = NetWorkCacheType.CACHE_TIME
+                    httpConfig.cacheNoNewWorkType = NoNetWorkCacheType.HAS_TIMEOUT
                 }
                 CacheType.NONE -> {
-                    httpConfig.cacheNetWorkType = HttpNetWorkType.NONE
-                    httpConfig.cacheNoNewWorkType = HttpCacheType.NONE
+                    httpConfig.cacheNetWorkType = NetWorkCacheType.NONE
+                    httpConfig.cacheNoNewWorkType = NoNetWorkCacheType.NONE
                 }
             }
         }

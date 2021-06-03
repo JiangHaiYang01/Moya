@@ -26,12 +26,12 @@ class Request {
             var viewModel: ViewModel? = null
         }
 
-        //添加请求头
+        // 添加请求头
         fun heard(key: String, value: String) = apply {
             config.heard[key] = value
         }
 
-        //添加请求参数
+        // 添加请求参数
         fun parameter(key: String, value: Any) = apply {
             config.map[key] = value
         }
@@ -44,12 +44,12 @@ class Request {
             config.viewModel = viewModel
         }
 
-        //动态切换请求的地址
+        // 动态切换请求的地址
         fun baseUrl(url: String) = apply {
             heard(DynamicHeard.DYNAMIC_URL, url)
         }
 
-        //动态切换connect time
+        // 动态切换connect time
         fun connectTimeOut(timeout: Int, timeUnit: TimeUnit = TimeUnit.MILLISECONDS) = apply {
             heard(DynamicHeard.DYNAMIC_CONNECT_TIME_OUT, timeout.toString())
             heard(
@@ -58,7 +58,7 @@ class Request {
             )
         }
 
-        //动态切换write time
+        // 动态切换write time
         fun writeTimeOut(timeout: Int, timeUnit: TimeUnit = TimeUnit.MILLISECONDS) = apply {
             heard(DynamicHeard.DYNAMIC_WRITE_TIME_OUT, timeout.toString())
             heard(
@@ -67,7 +67,7 @@ class Request {
             )
         }
 
-        //动态切换read time
+        // 动态切换read time
         fun readTimeOut(timeout: Int, timeUnit: TimeUnit = TimeUnit.MILLISECONDS) = apply {
             heard(DynamicHeard.DYNAMIC_READ_TIME_OUT, timeout.toString())
             heard(

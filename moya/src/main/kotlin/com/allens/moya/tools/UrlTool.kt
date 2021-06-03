@@ -1,7 +1,8 @@
 package com.allens.moya.tools
 
 object UrlTool {
-    //拼接URL
+
+    // 拼接URL
     fun prepareParam(paramMap: Map<String, Any>): String {
         val sb = StringBuilder()
         return if (paramMap.isEmpty()) {

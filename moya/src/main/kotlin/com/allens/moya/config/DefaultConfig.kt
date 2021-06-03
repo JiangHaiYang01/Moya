@@ -1,6 +1,6 @@
 package com.allens.moya.config
 
-import com.allens.moya.enums.HttpLevel
+import com.allens.moya.enums.LoggerLevel
 
 /**
  * 默认的配置参数
@@ -15,6 +15,6 @@ internal class DefaultConfig {
         const val DEFAULT_CACHE_SIZE = 10 * 1024 * 1024
         const val DEFAULT_TIME_OUT = 10L
         const val DEFAULT_RETRY = true
-        val DEFAULT_LEVEL = HttpLevel.BODY
+        val DEFAULT_LEVEL = LoggerLevel.BODY
     }
 }
