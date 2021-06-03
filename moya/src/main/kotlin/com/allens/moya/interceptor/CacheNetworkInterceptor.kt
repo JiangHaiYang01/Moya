@@ -1,12 +1,12 @@
 package com.allens.moya.interceptor
 
-import com.allens.moya.config.HttpConfig
+import com.allens.moya.config.MoyaConfig
 import com.allens.moya.enums.NetWorkCacheType
 import com.allens.moya.tools.MoyaLogTool
 import okhttp3.Interceptor
 import okhttp3.Response
 
-internal class CacheNetworkInterceptor(private val config: HttpConfig) : Interceptor {
+internal class CacheNetworkInterceptor(private val config: MoyaConfig) : Interceptor {
     override fun intercept(chain: Interceptor.Chain): Response {
         val time = when (config.cacheNetWorkType) {
             NetWorkCacheType.NOCACHE -> {

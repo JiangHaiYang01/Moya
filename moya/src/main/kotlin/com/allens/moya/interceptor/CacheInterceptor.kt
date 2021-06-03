@@ -5,7 +5,7 @@ import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.os.Build
 import androidx.annotation.RequiresApi
-import com.allens.moya.config.HttpConfig
+import com.allens.moya.config.MoyaConfig
 import com.allens.moya.enums.NoNetWorkCacheType
 import com.allens.moya.tools.MoyaLogTool
 import okhttp3.CacheControl
@@ -15,7 +15,7 @@ import okhttp3.Response
 import java.util.concurrent.TimeUnit
 
 
-internal class CacheInterceptor(private val context: Context, private val httpConfig: HttpConfig) :
+internal class CacheInterceptor(private val context: Context, private val httpConfig: MoyaConfig) :
     Interceptor {
     override fun intercept(chain: Interceptor.Chain): Response {
         val resp: Response

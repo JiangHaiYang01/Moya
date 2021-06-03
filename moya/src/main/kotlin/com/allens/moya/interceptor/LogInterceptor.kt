@@ -1,7 +1,7 @@
 package com.allens.moya.interceptor
 
 import android.os.Handler
-import com.allens.moya.config.HttpConfig
+import com.allens.moya.config.MoyaConfig
 import com.allens.moya.enums.LoggerLevel
 import com.allens.moya.tools.MoyaLogTool
 import okhttp3.logging.HttpLoggingInterceptor
@@ -16,7 +16,7 @@ import okhttp3.logging.HttpLoggingInterceptor
 
 //日志拦截器
 object LogInterceptor {
-    fun register(config: HttpConfig, handler: Handler): HttpLoggingInterceptor {
+    fun register(config: MoyaConfig, handler: Handler): HttpLoggingInterceptor {
         val interceptor = HttpLoggingInterceptor(object : HttpLoggingInterceptor.Logger {
             override fun log(message: String) {
                 MoyaLogTool.i(message)

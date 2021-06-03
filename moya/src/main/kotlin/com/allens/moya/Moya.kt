@@ -1,7 +1,7 @@
 package com.allens.moya
 
 import android.content.Context
-import com.allens.moya.config.HttpConfig
+import com.allens.moya.config.MoyaConfig
 import com.allens.moya.dslMarker.CacheTagMarker
 import com.allens.moya.dslMarker.TimeTagMarker
 import com.allens.moya.enums.CacheType
@@ -25,6 +25,10 @@ class Moya {
 
     private lateinit var manager: HttpManager
 
+    companion object {
+        var debug = false
+    }
+
     //创建一个新的请求
     fun create(): Request.Builder {
         return Request.Builder(manager)
@@ -35,7 +39,7 @@ class Moya {
     class Builder {
 
 
-        internal val httpConfig = HttpConfig()
+        internal val httpConfig = MoyaConfig()
 
         /***
          * 配置通用的 超时时间
@@ -207,13 +211,13 @@ class Moya {
             }
         }
 
-//        /***
-//         * 显示日志
-//         * [debug] true  会显示日志 在 logcat 上
-//         */
-//        fun debug(debug: Boolean) = apply {
-//            HttpConfig.DEBUG = debug
-//        }
+        /***
+         * 显示日志
+         * [debug] true  会显示日志 在 logcat 上
+         */
+        fun debug(debug: Boolean) = apply {
+            Moya.debug = debug
+        }
 
         fun build(context: Context): Moya {
             return Moya().apply {

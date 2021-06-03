@@ -15,7 +15,7 @@ import java.util.concurrent.TimeUnit
  * Moya 网络配置
  *
  */
-data class HttpConfig(
+data class MoyaConfig(
 
     // baseUrl
     var baseUrl: String = DefaultConfig.DEFAULT_BASE_URL,

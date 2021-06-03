@@ -8,6 +8,8 @@ package com.allens.moya.dslMarker
 @DslMarker
 annotation class CacheTagMarker
 
-
 @DslMarker
 annotation class TimeTagMarker
+
+@DslMarker
+annotation class LoggerMarker

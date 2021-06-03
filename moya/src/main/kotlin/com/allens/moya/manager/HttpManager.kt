@@ -6,7 +6,7 @@ import android.os.Handler
 import android.os.Looper
 import com.allens.moya.interceptor.CacheNetworkInterceptor
 import com.allens.moya.config.DefaultConfig
-import com.allens.moya.config.HttpConfig
+import com.allens.moya.config.MoyaConfig
 import com.allens.moya.enums.NetWorkCacheType
 import com.allens.moya.interceptor.*
 import com.allens.moya.tools.MoyaLogTool
@@ -30,9 +30,9 @@ class HttpManager {
     lateinit var retrofit: Retrofit
     lateinit var retrofitDownLoad: Retrofit
     private lateinit var context: Context
-    private lateinit var config: HttpConfig
+    private lateinit var config: MoyaConfig
 
-    fun createManager(config: HttpConfig, context: Context): HttpManager = apply {
+    fun createManager(config: MoyaConfig, context: Context): HttpManager = apply {
         this.config = config
         MoyaLogTool.i("httpConfig:$config")
 
@@ -113,7 +113,7 @@ class HttpManager {
         return okHttpBuilder
     }
 
-    private fun createRetrofit(config: HttpConfig, okHttpBuilder: OkHttpClient.Builder): Retrofit {
+    private fun createRetrofit(config: MoyaConfig, okHttpBuilder: OkHttpClient.Builder): Retrofit {
         val retrofitBuilder = Retrofit.Builder()
         val client = retrofitBuilder
             .client(okHttpBuilder.build())

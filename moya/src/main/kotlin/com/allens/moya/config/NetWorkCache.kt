@@ -7,7 +7,7 @@ import com.allens.moya.enums.NoNetWorkCacheType
 
 
 @CacheTagMarker
-data class NetCacheCache(
+data class NetWorkCache(
 
     // 缓存策略 默认不加入缓存的逻辑
     var type :CacheType = CacheType.NONE,

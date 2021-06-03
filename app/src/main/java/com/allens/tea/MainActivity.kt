@@ -10,6 +10,8 @@ import androidx.core.view.setPadding
 import androidx.lifecycle.viewModelScope
 import com.allens.moya.*
 import com.allens.moya.enums.CacheType
+import com.allens.moya.enums.LoggerLevel
+import com.allens.moya.impl.OnLogInterceptor
 import com.allens.moya.request.DownLoadRequest
 import com.allens.moya_coroutines.request.*
 import com.allens.tea.databinding.ActivityMainBinding
@@ -29,14 +31,14 @@ class MainActivity : AppCompatActivity() {
     }
 
     private val moya by lazy {
-//        Moya.Builder()
-//            // base url
-//            .baseUrl("https://www.wanandroid.com")
-//            .head("hello", "world")
-//            .build(this)
+        Moya.Builder()
+            .baseUrl("https://www.wanandroid.com")
+            .head("hello", "world")
+            .build(this)
 
-        moya(this){
+        moya(this) {
             url = "https://www.wanandroid.com"
+            retry = true
             time = {
                 connect = 1L
                 write = 2L
@@ -49,6 +51,21 @@ class MainActivity : AppCompatActivity() {
                 noNetworkTimeOut = 10
                 networkTimeOut = 10
             }
+            head = {
+                put("hello", "world")
+            }
+            log = {
+                level = LoggerLevel.BASIC
+                interceptors = setOf(object : OnLogInterceptor {
+                    override fun onLogInterceptorInfo(message: String) {
+
+                    }
+                })
+            }
+
+            adapter = {}
+            converter = {}
+            cookie = {}
         }
     }
 
