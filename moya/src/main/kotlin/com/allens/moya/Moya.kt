@@ -3,6 +3,7 @@ package com.allens.moya
 import android.content.Context
 import com.allens.moya.config.MoyaConfig
 import com.allens.moya.dslMarker.CacheTagMarker
+import com.allens.moya.dslMarker.LoggerMarker
 import com.allens.moya.dslMarker.TimeTagMarker
 import com.allens.moya.enums.CacheType
 import com.allens.moya.enums.NetWorkCacheType
@@ -34,6 +35,7 @@ class Moya {
         return Request.Builder(manager)
     }
 
+    @LoggerMarker
     @TimeTagMarker
     @CacheTagMarker
     class Builder {

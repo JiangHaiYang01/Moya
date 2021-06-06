@@ -31,10 +31,10 @@ class MainActivity : AppCompatActivity() {
     }
 
     private val moya by lazy {
-        Moya.Builder()
-            .baseUrl("https://www.wanandroid.com")
-            .head("hello", "world")
-            .build(this)
+//        Moya.Builder()
+//            .baseUrl("https://www.wanandroid.com")
+//            .head("hello", "world")
+//            .build(this)
 
         moya(this) {
             url = "https://www.wanandroid.com"
