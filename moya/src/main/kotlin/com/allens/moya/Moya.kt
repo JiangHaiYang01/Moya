@@ -1,6 +1,7 @@
 package com.allens.moya
 
 import android.content.Context
+import com.allens.moya.config.DefaultConfig
 import com.allens.moya.config.MoyaConfig
 import com.allens.moya.dslMarker.CacheTagMarker
 import com.allens.moya.dslMarker.LoggerMarker
@@ -27,7 +28,7 @@ class Moya {
     private lateinit var manager: HttpManager
 
     companion object {
-        var debug = false
+        var debug = DefaultConfig.DEFAULT_DEBUG
     }
 
     //创建一个新的请求

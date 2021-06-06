@@ -15,6 +15,7 @@ internal class DefaultConfig {
         const val DEFAULT_CACHE_SIZE = 10 * 1024 * 1024
         const val DEFAULT_TIME_OUT = 10L
         const val DEFAULT_RETRY = true
+        const val DEFAULT_DEBUG = false
         val DEFAULT_LEVEL = LoggerLevel.BODY
     }
 }

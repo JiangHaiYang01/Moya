@@ -8,6 +8,7 @@ import com.allens.moya.impl.OnLogInterceptor
 @LoggerMarker
 data class LoggerConfig(
     var level: LoggerLevel = DefaultConfig.DEFAULT_LEVEL,
+    var debug: Boolean = DefaultConfig.DEFAULT_DEBUG,
     var interceptors: Set<OnLogInterceptor>? = null
 
 )

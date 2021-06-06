@@ -31,42 +31,35 @@ class MainActivity : AppCompatActivity() {
     }
 
     private val moya by lazy {
-//        Moya.Builder()
-//            .baseUrl("https://www.wanandroid.com")
-//            .head("hello", "world")
-//            .build(this)
+        Moya.Builder()
+            // base url
+            .baseUrl("https://www.wanandroid.com")
+            // 读写连接超时
+            .connectTimeout(10)
+            .readTimeout(10)
+            .writeTimeout(10)
+            // 缓存配置
+            .cacheType(CacheType.NONE)
+            .cachePath("")
+            .cacheSize(10)
 
-        moya(this) {
-            url = "https://www.wanandroid.com"
-            retry = true
-            time = {
-                connect = 1L
-                write = 2L
-                read = 3L
-            }
-            cache = {
-                type = CacheType.NONE
-                path = ""
-                size = 10
-                noNetworkTimeOut = 10
-                networkTimeOut = 10
-            }
-            head = {
-                put("hello", "world")
-            }
-            log = {
-                level = LoggerLevel.BASIC
-                interceptors = setOf(object : OnLogInterceptor {
-                    override fun onLogInterceptorInfo(message: String) {
+            .cacheNetWorkTimeOut(10)
+            .cacheNoNetWorkTimeOut(10)
+            // 日志配置
+            .logLevel(LoggerLevel.BASIC)
+            .debug(true)
+            .logInterceptor(object : OnLogInterceptor {
+                override fun onLogInterceptorInfo(message: String) {
 
-                    }
-                })
-            }
-
-            adapter = {}
-            converter = {}
-            cookie = {}
-        }
+                }
+            })
+            // 构建工厂配置
+//            .callAdapterFactory()
+//            .converterFactory()
+            // 配置全部请求头
+            .head("hello", "world")
+            // 构建moya
+            .build(this)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {

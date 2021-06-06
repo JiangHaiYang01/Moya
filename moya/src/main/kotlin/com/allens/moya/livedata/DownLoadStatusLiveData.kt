@@ -5,6 +5,7 @@ import androidx.lifecycle.*
 import com.allens.moya.manager.DownLoadManagerImpl
 import com.allens.moya.request.BasicDownLoadRequest
 import com.allens.moya.request.DownLoadRequest
+import com.allens.moya.request.Request
 import com.allens.moya.request.getKey
 import com.allens.moya.result.Disposable
 import com.allens.moya.result.DownLoadBuilder
@@ -17,7 +18,7 @@ typealias DownLoadStatusLiveData = MutableLiveData<DownLoadResult>
 @MainThread
 fun <T : BasicDownLoadRequest, R : Disposable> DownLoadStatusLiveData.observerState(
     manager: DownLoadManagerImpl<T, R>,
-    owner: LifecycleOwner? = null,
+    config: Request.Builder.Config,
     request: DownLoadRequest,
     init: (DownLoadBuilder.() -> Unit)? = null
 ) {
@@ -56,11 +57,12 @@ fun <T : BasicDownLoadRequest, R : Disposable> DownLoadStatusLiveData.observerSt
         }
     }
     val observer = Observer(function)
+    val lifeCycle = config.owner
     when {
-        owner != null -> {
+        lifeCycle != null -> {
             //如果传入了 lifecycle 就交给lifecycle控制，缺点是在后台的时候，不会在change变化
-            observe(owner, observer)
-            owner.lifecycle.addObserver(object : LifecycleEventObserver {
+            observe(lifeCycle, observer)
+            lifeCycle.lifecycle.addObserver(object : LifecycleEventObserver {
                 override fun onStateChanged(source: LifecycleOwner, event: Lifecycle.Event) {
                     if (event == Lifecycle.Event.ON_DESTROY) {
                         manager.observer.remove(request.getKey())

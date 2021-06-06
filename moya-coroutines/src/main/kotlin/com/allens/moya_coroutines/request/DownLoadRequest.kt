@@ -27,7 +27,7 @@ suspend fun Request.Builder.doDownLoad(
         withContext(Dispatchers.Main) {
             data.liveData?.observerState(
                 manager = CoroutinesDownLoadManager,
-                owner = config.owner,
+                config = config,
                 request = coroutinesDownLoadRequest,
                 init = init
             )
